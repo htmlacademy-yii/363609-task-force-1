@@ -15,11 +15,18 @@ class Task
 
     private $executorId;
     private $customerId;
+    private $current_status;
 
     public function __construct($executor, $customer)
     {
         $this->executorId = $executor;
         $this->customerId = $customer;
+        $this->getStatus();
+    }
+
+    private function getStatus(){
+        //тут получаем статус из бд, пока пусть будет новый
+        $this->current_status = self::STATUS_NEW;
     }
 
     public function getAllStatus()
@@ -47,9 +54,9 @@ class Task
         return $arActions;
     }
 
-    public function getAvailAction($status)
+    public function getAvailAction()
     {
-        switch ($status) {
+        switch ($this->current_status) {
 
             case self::STATUS_NEW:
                 $arAction = [
@@ -73,34 +80,34 @@ class Task
         return $arAction;
     }
 
-    public function getNextStatus($action, $current_status)
+    public function getNextStatus($action)
     {
         switch ($action) {
 
             case self::ACTION_CANCEL:
 
-                if($current_status == self::STATUS_NEW) {
+                if($this->current_status == self::STATUS_NEW) {
                     $nextStatus = self::STATUS_CANCELED;
                 }
                 break;
 
             case self::ACTION_RESPOND:
 
-                if($current_status == self::STATUS_NEW) {
+                if($this->current_status == self::STATUS_NEW) {
                     $nextStatus = self::STATUS_IN_WORK;
                 }
                 break;
 
             case self::ACTION_DONE:
 
-                if($current_status == self::STATUS_IN_WORK) {
+                if($this->current_status == self::STATUS_IN_WORK) {
                     $nextStatus = self::STATUS_COMPLETED;
                 }
                 break;
 
             case self::ACTION_REFUSE:
 
-                if($current_status == self::STATUS_IN_WORK) {
+                if($this->current_status == self::STATUS_IN_WORK) {
                     $nextStatus = self::STATUS_FAILED;
                 }
                 break;
