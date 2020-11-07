@@ -8,7 +8,7 @@ $task = new Task(1, 2, 'new');
 <h3>Карта статусов</h3>
 <?php
 echo '<pre>';
-var_dump($task->getAllStatus());
+var_dump(Task::STATUSES_LIST);
 echo '</pre>';
 ?>
 </div>
@@ -16,7 +16,7 @@ echo '</pre>';
 <h3>Карта действий</h3>
 <?php
 echo '<pre>';
-var_dump($task->getAllActions());
+var_dump(Task::ACTIONS_LIST);
 echo '</pre>';
 ?>
 </div>
@@ -32,7 +32,7 @@ assert($task->getNextStatus(Task::ACTION_CANCEL) == Task::STATUS_CANCELED, '!Can
 <?php
 echo 'Статус новый';
 echo '<pre>';
-var_dump($task->getAvailAction());
+var_dump($task->getAvailableActions());
 echo '</pre>';
 ?>
 </div>

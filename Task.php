@@ -13,110 +13,78 @@ class Task
     const ACTION_DONE = 'done';
     const ACTION_REFUSE = 'refuse';
 
-    private $executorId;
-    private $customerId;
-    private $current_status;
-
-    public function __construct($executor, $customer)
-    {
-        $this->executorId = $executor;
-        $this->customerId = $customer;
-        $this->getStatus();
-    }
-
-    private function getStatus(){
-        //тут получаем статус из бд, пока пусть будет новый
-        $this->current_status = self::STATUS_NEW;
-    }
-
-    public function getAllStatus()
-    {
-        $arStatus = [
+    const STATUSES_LIST = [
           self::STATUS_NEW => 'Новое',
           self::STATUS_CANCELED => 'Отменено',
           self::STATUS_IN_WORK => 'В работе',
           self::STATUS_COMPLETED => 'Выполнено',
           self::STATUS_FAILED => 'Провалено',
-        ];
+    ];
 
-        return $arStatus;
+    const ACTIONS_LIST = [
+        self::ACTION_CANCEL => 'Отменить',
+        self::ACTION_RESPOND => 'Откликнуться',
+        self::ACTION_DONE => 'Выполнено',
+        self::ACTION_REFUSE => 'Отказаться',
+    ];
+
+    const AVAILABLE_ACTIONS_MAP = [
+        self::STATUS_NEW => [
+            self::ACTION_CANCEL,
+            self::ACTION_RESPOND
+        ],
+        self::STATUS_IN_WORK => [
+            self::ACTION_DONE,
+            self::ACTION_REFUSE
+        ],
+    ];
+
+    private $executorId;
+    private $customerId;
+    private $currentStatus;
+
+    public function __construct($executor, $customer)
+    {
+        $this->executorId = $executor;
+        $this->customerId = $customer;
+        //тут устанавливаем статус из бд, пока пусть будет новый
+        $this->currentStatus = self::STATUS_NEW;
     }
 
-    public function getAllActions()
+    public function getAvailableActions()
     {
-        $arActions = [
-            self::ACTION_CANCEL => 'Отменить',
-            self::ACTION_RESPOND => 'Откликнуться',
-            self::ACTION_DONE => 'Выполнено',
-            self::ACTION_REFUSE => 'Отказаться',
-        ];
-
-        return $arActions;
-    }
-
-    public function getAvailAction()
-    {
-        switch ($this->current_status) {
-
-            case self::STATUS_NEW:
-                $arAction = [
-                    'customer' => self::ACTION_CANCEL,
-                    'executor' => self::ACTION_RESPOND,
-                ];
-                break;
-
-            case self::STATUS_IN_WORK:
-                $arAction = [
-                    'customer' => self::ACTION_DONE,
-                    'executor' => self::ACTION_REFUSE,
-                ];
-                break;
-
-            default:
-                $arAction = 'no actions available';
-
-        }
-
-        return $arAction;
+        return self::AVAILABLE_ACTIONS_MAP[$this->currentStatus] ?? null;
     }
 
     public function getNextStatus($action)
     {
-        switch ($action) {
+        switch (true) {
 
-            case self::ACTION_CANCEL:
+            case $action === self::ACTION_CANCEL && $this->currentStatus === self::STATUS_NEW:
 
-                if($this->current_status == self::STATUS_NEW) {
-                    $nextStatus = self::STATUS_CANCELED;
-                }
+                return self::STATUS_CANCELED;
                 break;
 
             case self::ACTION_RESPOND:
 
-                if($this->current_status == self::STATUS_NEW) {
+                if($this->currentStatus == self::STATUS_NEW) {
                     $nextStatus = self::STATUS_IN_WORK;
                 }
                 break;
 
-            case self::ACTION_DONE:
+            case $action === self::ACTION_DONE && $this->currentStatus == self::STATUS_IN_WORK:
 
-                if($this->current_status == self::STATUS_IN_WORK) {
-                    $nextStatus = self::STATUS_COMPLETED;
-                }
+                return self::STATUS_COMPLETED;
                 break;
 
-            case self::ACTION_REFUSE:
+            case $action === self::ACTION_REFUSE && $this->currentStatus == self::STATUS_IN_WORK:
 
-                if($this->current_status == self::STATUS_IN_WORK) {
-                    $nextStatus = self::STATUS_FAILED;
-                }
+                return self::STATUS_FAILED;
                 break;
 
-        }
-        if(empty($nextStatus)) {
-            $nextStatus = 'no statuses available';
-        }
+            default:
+                return null;
 
-        return $nextStatus;
+        }
     }
 }
