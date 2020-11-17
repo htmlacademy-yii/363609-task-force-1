@@ -67,11 +67,9 @@ class Task
                 return self::STATUS_CANCELED;
                 break;
 
-            case self::ACTION_RESPOND:
+            case $action === self::ACTION_RESPOND && $this->currentStatus == self::STATUS_NEW:
 
-                if($this->currentStatus == self::STATUS_NEW) {
-                    $nextStatus = self::STATUS_IN_WORK;
-                }
+                return self::STATUS_IN_WORK;
                 break;
 
             case $action === self::ACTION_DONE && $this->currentStatus == self::STATUS_IN_WORK:
