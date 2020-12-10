@@ -1,6 +1,7 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/Task.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php';
+use Razot\controller\Task;
 
 $task = new Task(1, 2, 'new');
 ?>
