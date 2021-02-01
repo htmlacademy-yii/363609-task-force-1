@@ -43,6 +43,7 @@ class Task
 
     private $executorId;
     private $customerId;
+    private $currentUser;
     private $currentStatus;
 
     public function __construct($executor, $customer)
@@ -51,11 +52,38 @@ class Task
         $this->customerId = $customer;
         //тут устанавливаем статус из бд, пока пусть будет новый
         $this->currentStatus = self::STATUS_NEW;
+        //id авторизованного юзера
+        $this->currentUser = 2;
     }
 
     public function getAvailableActions()
     {
-        return self::AVAILABLE_ACTIONS_MAP[$this->currentStatus] ?? null;
+        switch (true) {
+
+            case $this->currentStatus == self::STATUS_NEW && CancelAction::checkPermission($this->executorId, $this->customerId, $this->currentUser):
+
+                return new CancelAction();
+                break;
+
+            case $this->currentStatus == self::STATUS_NEW && RespondAction::checkPermission($this->executorId, $this->customerId, $this->currentUser):
+
+                return new RespondAction();
+                break;
+
+            case $this->currentStatus == self::STATUS_IN_WORK && DoneAction::checkPermission($this->executorId, $this->customerId, $this->currentUser):
+
+                return new DoneAction();
+                break;
+
+            case $this->currentStatus == self::STATUS_IN_WORK && RefuseAction::checkPermission($this->executorId, $this->customerId, $this->currentUser):
+
+                return new RefuseAction();
+                break;
+
+            default:
+                return null;
+
+        }
     }
 
     public function getNextStatus($action)
