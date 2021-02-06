@@ -14,13 +14,8 @@ class RespondAction extends Action
         return 'Откликнуться';
     }
 
-    public static function checkPermission($executorId, $customerId, $currentUserId)
+    public static function checkPermission($task, $currentUserId)
     {
-        if($executorId != $currentUserId) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return $task->getExecutor() != $currentUserId && $task->getCurrentStatus() == $task::STATUS_NEW;
     }
 }

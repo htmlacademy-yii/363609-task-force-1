@@ -3,7 +3,8 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php';
 use Razot\controller\Task;
 
-$task = new Task(1, 2);
+//$task = new Task(1, 2);
+$task = new Task();
 ?>
 <div>
     <h3>Карта статусов</h3>

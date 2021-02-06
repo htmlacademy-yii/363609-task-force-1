@@ -14,14 +14,9 @@ class CancelAction extends Action
         return 'Отменить';
     }
 
-    public static function checkPermission($executorId, $customerId, $currentUserId)
+    public static function checkPermission($task, $currentUserId)
     {
-        if($customerId == $currentUserId) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return $task->getCustomer() == $currentUserId && $task->getCurrentStatus() == $task::STATUS_NEW;
     }
 
 }

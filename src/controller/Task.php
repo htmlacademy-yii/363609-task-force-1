@@ -30,60 +30,62 @@ class Task
         self::ACTION_REFUSE => 'Отказаться',
     ];
 
-    const AVAILABLE_ACTIONS_MAP = [
-        self::STATUS_NEW => [
-            self::ACTION_CANCEL,
-            self::ACTION_RESPOND
-        ],
-        self::STATUS_IN_WORK => [
-            self::ACTION_DONE,
-            self::ACTION_REFUSE
-        ],
+//    const AVAILABLE_ACTIONS_MAP = [
+//        self::STATUS_NEW => [
+//            self::ACTION_CANCEL,
+//            self::ACTION_RESPOND
+//        ],
+//        self::STATUS_IN_WORK => [
+//            self::ACTION_DONE,
+//            self::ACTION_REFUSE
+//        ],
+//    ];
+
+    private const AVAILABLE_ACTIONS_MAP = [
+        CancelAction::class,
+        DoneAction::class,
+        RefuseAction::class,
+        RespondAction::class
     ];
 
-    private $executorId;
-    private $customerId;
-    private $currentUser;
-    private $currentStatus;
+    private $executorId = 1;
+    private $customerId = 2;
+    private $currentUser = 2;
+    private $currentStatus = self::STATUS_NEW;
 
-    public function __construct($executor, $customer)
+//    public function __construct($executor, $customer)
+//    {
+//        $this->executorId = $executor;
+//        $this->customerId = $customer;
+//        //тут устанавливаем статус из бд, пока пусть будет новый
+//        $this->currentStatus = self::STATUS_NEW;
+//        //id авторизованного юзера
+//        $this->currentUser = 2;
+//    }
+
+   public function getExecutor()
+   {
+       return $this->executorId;
+   }
+
+    public function getCustomer()
     {
-        $this->executorId = $executor;
-        $this->customerId = $customer;
-        //тут устанавливаем статус из бд, пока пусть будет новый
-        $this->currentStatus = self::STATUS_NEW;
-        //id авторизованного юзера
-        $this->currentUser = 2;
+        return $this->customerId;
+    }
+
+    public function getCurrentStatus()
+    {
+        return $this->currentStatus;
     }
 
     public function getAvailableActions()
     {
-        switch (true) {
+        $task = new Task();
+        $currentUser = $this->currentUser;
 
-            case $this->currentStatus == self::STATUS_NEW && CancelAction::checkPermission($this->executorId, $this->customerId, $this->currentUser):
-
-                return new CancelAction();
-                break;
-
-            case $this->currentStatus == self::STATUS_NEW && RespondAction::checkPermission($this->executorId, $this->customerId, $this->currentUser):
-
-                return new RespondAction();
-                break;
-
-            case $this->currentStatus == self::STATUS_IN_WORK && DoneAction::checkPermission($this->executorId, $this->customerId, $this->currentUser):
-
-                return new DoneAction();
-                break;
-
-            case $this->currentStatus == self::STATUS_IN_WORK && RefuseAction::checkPermission($this->executorId, $this->customerId, $this->currentUser):
-
-                return new RefuseAction();
-                break;
-
-            default:
-                return null;
-
-        }
+        return array_filter(self::AVAILABLE_ACTIONS_MAP, function ($action) use ($task, $currentUser){
+            return call_user_func([$action, 'checkPermission'], $task, $currentUser);
+        });
     }
 
     public function getNextStatus($action)

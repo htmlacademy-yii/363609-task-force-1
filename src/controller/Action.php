@@ -8,5 +8,5 @@ abstract class Action
 
     abstract public function getCode();
 
-    abstract public static function checkPermission($executorId, $customerId, $currentUserId);
+    abstract public static function checkPermission(Task $task, int $currentUserId);
 }
