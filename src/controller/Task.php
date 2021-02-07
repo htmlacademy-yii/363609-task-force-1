@@ -48,20 +48,18 @@ class Task
         RespondAction::class
     ];
 
-    private $executorId = 1;
-    private $customerId = 2;
-    private $currentUser = 2;
+    private $executorId;
+    private $customerId;
+    private $currentUser;
     private $currentStatus = self::STATUS_NEW;
 
-//    public function __construct($executor, $customer)
-//    {
-//        $this->executorId = $executor;
-//        $this->customerId = $customer;
-//        //тут устанавливаем статус из бд, пока пусть будет новый
-//        $this->currentStatus = self::STATUS_NEW;
-//        //id авторизованного юзера
-//        $this->currentUser = 2;
-//    }
+    public function __construct($executor, $customer)
+    {
+        $this->executorId = $executor;
+        $this->customerId = $customer;
+        //id авторизованного юзера
+        $this->currentUser = 1;
+    }
 
    public function getExecutor()
    {
@@ -80,11 +78,10 @@ class Task
 
     public function getAvailableActions()
     {
-        $task = new Task();
         $currentUser = $this->currentUser;
 
-        return array_filter(self::AVAILABLE_ACTIONS_MAP, function ($action) use ($task, $currentUser){
-            return call_user_func([$action, 'checkPermission'], $task, $currentUser);
+        return array_filter(self::AVAILABLE_ACTIONS_MAP, function ($action) use ($currentUser){
+            return call_user_func([$action, 'checkPermission'], $this, $currentUser);
         });
     }
 
