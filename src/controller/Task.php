@@ -30,32 +30,59 @@ class Task
         self::ACTION_REFUSE => 'Отказаться',
     ];
 
-    const AVAILABLE_ACTIONS_MAP = [
-        self::STATUS_NEW => [
-            self::ACTION_CANCEL,
-            self::ACTION_RESPOND
-        ],
-        self::STATUS_IN_WORK => [
-            self::ACTION_DONE,
-            self::ACTION_REFUSE
-        ],
+//    const AVAILABLE_ACTIONS_MAP = [
+//        self::STATUS_NEW => [
+//            self::ACTION_CANCEL,
+//            self::ACTION_RESPOND
+//        ],
+//        self::STATUS_IN_WORK => [
+//            self::ACTION_DONE,
+//            self::ACTION_REFUSE
+//        ],
+//    ];
+
+    private const AVAILABLE_ACTIONS_MAP = [
+        CancelAction::class,
+        DoneAction::class,
+        RefuseAction::class,
+        RespondAction::class
     ];
 
     private $executorId;
     private $customerId;
-    private $currentStatus;
+    private $currentUser;
+    private $currentStatus = self::STATUS_NEW;
 
     public function __construct($executor, $customer)
     {
         $this->executorId = $executor;
         $this->customerId = $customer;
-        //тут устанавливаем статус из бд, пока пусть будет новый
-        $this->currentStatus = self::STATUS_NEW;
+        //id авторизованного юзера
+        $this->currentUser = 1;
+    }
+
+   public function getExecutor()
+   {
+       return $this->executorId;
+   }
+
+    public function getCustomer()
+    {
+        return $this->customerId;
+    }
+
+    public function getCurrentStatus()
+    {
+        return $this->currentStatus;
     }
 
     public function getAvailableActions()
     {
-        return self::AVAILABLE_ACTIONS_MAP[$this->currentStatus] ?? null;
+        $currentUser = $this->currentUser;
+
+        return array_filter(self::AVAILABLE_ACTIONS_MAP, function ($action) use ($currentUser){
+            return call_user_func([$action, 'checkPermission'], $this, $currentUser);
+        });
     }
 
     public function getNextStatus($action)
