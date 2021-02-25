@@ -2,9 +2,15 @@
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php';
 use Razot\controller\Task;
+use Razot\ex\StatusException;
 
-$task = new Task(1, 2);
-
+try {
+    $task = new Task(1, 2, 'new');
+}
+catch (StatusException $e) {
+    var_dump($e->getMessage());
+    die;
+}
 ?>
 <div>
     <h3>Карта статусов</h3>

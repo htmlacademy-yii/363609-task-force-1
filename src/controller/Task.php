@@ -1,6 +1,7 @@
 <?php
 
 namespace Razot\controller;
+use Razot\ex\StatusException;
 
 class Task
 {
@@ -51,32 +52,37 @@ class Task
     private $executorId;
     private $customerId;
     private $currentUser;
-    private $currentStatus = self::STATUS_NEW;
+    //private $currentStatus = self::STATUS_NEW;
+    private $currentStatus;
 
-    public function __construct($executor, $customer)
+    public function __construct(int $executor, int $customer, string $currentStatus = self::STATUS_NEW)
     {
         $this->executorId = $executor;
         $this->customerId = $customer;
         //id авторизованного юзера
         $this->currentUser = 1;
+        if(!isset(self::STATUSES_LIST[$currentStatus])) {
+            throw new StatusException('Данный статус не существует');
+        }
+        $this->currentStatus = $currentStatus;
     }
 
-   public function getExecutor()
+   public function getExecutor() :int
    {
        return $this->executorId;
    }
 
-    public function getCustomer()
+    public function getCustomer() :int
     {
         return $this->customerId;
     }
 
-    public function getCurrentStatus()
+    public function getCurrentStatus() :string
     {
         return $this->currentStatus;
     }
 
-    public function getAvailableActions()
+    public function getAvailableActions() :array
     {
         $currentUser = $this->currentUser;
 
@@ -85,7 +91,7 @@ class Task
         });
     }
 
-    public function getNextStatus($action)
+    public function getNextStatus($action) :?string
     {
         switch (true) {
 
