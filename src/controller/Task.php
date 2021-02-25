@@ -61,7 +61,7 @@ class Task
         $this->customerId = $customer;
         //id авторизованного юзера
         $this->currentUser = 1;
-        if(!self::STATUSES_LIST[$currentStatus]) {
+        if(isset(self::STATUSES_LIST[$currentStatus])) {
             throw new StatusException('Данный статус не существует');
         }
         $this->currentStatus = $currentStatus;
