@@ -3,6 +3,11 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php';
 use Razot\controller\Task;
 use Razot\ex\StatusException;
+use Razot\model\CreateSql;
+
+echo '<pre>';
+$file = new CreateSql(['categories', 'cities', 'opinions', 'profiles', 'replies', 'tasks', 'users']);
+echo '</pre>';
 
 try {
     $task = new Task(1, 2, 'new');
