@@ -6,7 +6,7 @@ use Razot\ex\StatusException;
 use Razot\model\CreateSql;
 
 echo '<pre>';
-$file = new CreateSql(['categories', 'cities', 'opinions', 'profiles', 'replies', 'tasks', 'users']);
+$file = new CreateSql(glob(__DIR__ . '/data/*.csv'), 'data');
 echo '</pre>';
 
 try {

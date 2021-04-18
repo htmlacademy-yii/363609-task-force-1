@@ -4,53 +4,50 @@ use SplFileObject;
 
 class CreateSql {
 
-    public array $arFiles = [];
+    private array $arFiles = [];
+    private string $dir;
 
-    public function __construct(array $files)
+    public function __construct(array $files, string $dir)
     {
         $this->arFiles = $files;
+        $this->dir = $dir;
         $this->createFile();
     }
 
     private function createFile()
     {
         foreach ($this->arFiles as $item) {
-           $str =  $this->readFile($item);
-           file_put_contents($_SERVER['DOCUMENT_ROOT'] . '/data/' . $item . '.sql', $str);
+           $arReturn =  $this->parse($item);
+           file_put_contents($_SERVER['DOCUMENT_ROOT'] . '/'. $this->dir .'/' . $arReturn['tableName'] . '.sql', $arReturn['str']);
         }
     }
 
-    private function readFile($item) :string
+    private function parse($item) :array
     {
-        $str = '';
-        $file = new SplFileObject($_SERVER['DOCUMENT_ROOT'] . '/data/'.$item.'.csv');
+        $file = new SplFileObject($item);
         $file->setFlags(SplFileObject::READ_CSV);
-        $file->seek($file->getSize());
-        $linesTotal = $file->key();
-        foreach ($file as $k => $line) {
-            if(!$file->eof()) {
-                if($k == 0) {
-                    $str = 'INSERT INTO `' . $item . '` (';
-                    foreach ($file->current() as $x => $value) {
-                        $str .= '`' . $value . '`';
-                        if(count($file->current()) != $x + 1)
-                            $str .= ', ';
-                    }
-                    $str .= ') VALUES ';
-                }
-                else {
-                    $str .= '(';
-                    foreach ($file->current() as $x => $value) {
-                        $str .= "'" . $value . "'";
-                        if(count($file->current()) != $x + 1)
-                            $str .= ', ';
-                    }
-                    $str .= ')';
-                    if($linesTotal != $k + 1)
-                        $str .= ',';
-                }
+        $columns = [];
+        $values = [];
+        $i = 0;
+        while ($file->valid()) {
+            if ($i == 0) {
+                $columns = $file->fgetcsv(',');
+            } else {
+                $ar = $file->fgetcsv(',');
+                if(!empty($ar[0]))
+                    $values[] = '(' . implode(', ' , array_map(function ($item) {
+                                return "'".$item."'";
+                            }, $ar)) . ')';
             }
+            $i++;
         }
-        return $str;
+
+        $tableName = str_replace('.csv', '', $file->getBasename());
+
+        $str = 'INSERT INTO `' . $tableName . '` (' . implode(', ' , array_map(function ($item) {
+            return "`".$item."`";
+            }, $columns)) . ') VALUES ' . implode(', ' , $values);
+
+        return compact('str', 'tableName');
     }
 }
