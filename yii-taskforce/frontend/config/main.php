@@ -42,7 +42,9 @@ return [
             'showScriptName' => false,
             'enableStrictParsing' => false,
             'rules' => [
-                'login' => 'site/login'
+                'login' => 'site/login',
+                'users' => 'users/index',
+                'tasks' => 'tasks/index'
             ],
         ],
     ],

@@ -3,6 +3,7 @@
 namespace frontend\models\db;
 
 use Yii;
+use frontend\models\db\Categories;
 
 /**
  * This is the model class for table "tasks".
@@ -20,6 +21,24 @@ use Yii;
  */
 class Tasks extends \yii\db\ActiveRecord
 {
+
+    /*
+     * статусы задач
+     */
+    const STATUS_NEW = 1;
+    const STATUS_CANCELED = 2;
+    const STATUS_IN_WORK = 3;
+    const STATUS_COMPLETED = 4;
+    const STATUS_FAILED = 5;
+
+    const STATUSES_LIST = [
+        self::STATUS_NEW => 'Новое',
+        self::STATUS_CANCELED => 'Отменено',
+        self::STATUS_IN_WORK => 'В работе',
+        self::STATUS_COMPLETED => 'Выполнено',
+        self::STATUS_FAILED => 'Провалено',
+    ];
+
     /**
      * {@inheritdoc}
      */
@@ -34,8 +53,8 @@ class Tasks extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['dt_add', 'expire'], 'safe'],
-            [['category_id', 'budget'], 'integer'],
+            [['dt_add', 'expire'], 'date', 'format' => 'php:Y-m-d'],
+            [['category_id', 'budget', 'status'], 'integer'],
             [['description', 'address'], 'string'],
             [['lat', 'long'], 'number'],
             [['name'], 'string', 'max' => 255],
@@ -59,5 +78,10 @@ class Tasks extends \yii\db\ActiveRecord
             'lat' => 'Lat',
             'long' => 'Long',
         ];
+    }
+
+    public function getCategories()
+    {
+        return $this->hasOne(Categories::class, ['id' => 'category_id']);
     }
 }
