@@ -22,7 +22,8 @@ class m130524_201442_init extends Migration
             'status' => $this->smallInteger()->notNull()->defaultValue(10),
             'created_at' => $this->integer()->notNull(),
             'updated_at' => $this->integer()->notNull(),
-            'dt_add' => $this->date()
+            'dt_add' => $this->date(),
+            'photo' => $this->string(255)
         ], $tableOptions);
     }
 

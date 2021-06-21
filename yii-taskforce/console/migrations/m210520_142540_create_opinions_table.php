@@ -16,7 +16,8 @@ class m210520_142540_create_opinions_table extends Migration
             'id' => $this->primaryKey(),
             'dt_add' => $this->date(),
             'rate' => $this->integer(10),
-            'description' => $this->text()
+            'description' => $this->text(),
+            'user_id' => $this->integer()
         ]);
     }
 

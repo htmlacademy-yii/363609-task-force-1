@@ -6,6 +6,8 @@ use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
+use frontend\models\db\Profiles;
+use frontend\models\db\Opinions;
 
 /**
  * User model
@@ -209,4 +211,37 @@ class User extends ActiveRecord implements IdentityInterface
     {
         $this->password_reset_token = null;
     }
+
+    /**
+     * получение данных профиля
+     */
+    public function getProfile()
+    {
+        return $this->hasOne(Profiles::class, ['user_id' => 'id']);
+    }
+
+    /**
+     * получение отзывов о юзере
+     */
+    public function getOpinions()
+    {
+        return $this->hasMany(Opinions::class, ['user_id' => 'id']);
+    }
+
+    /**
+     * получение рейтинга юзера по отзывам
+     */
+    public function getOpinionsRating()
+    {
+        $sum = 0;
+        $ratings = Opinions::find()
+            ->where(['user_id' => $this->id])
+            ->select(['rate'])
+            ->all();
+        foreach ($ratings as $rating) {
+            $sum += $rating->rate;
+        }
+        return round($sum / count($ratings), 2);
+    }
+
 }
