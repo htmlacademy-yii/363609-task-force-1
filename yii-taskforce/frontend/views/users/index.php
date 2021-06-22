@@ -23,7 +23,7 @@
                 <div class="feedback-card__top">
                     <div class="user__search-icon">
                         <a href="#"><img src="<?=$item->photo?>" width="65" height="65"></a>
-                        <span>17 заданий</span>
+                        <span><?=count($item->tasksExecutor)?> заданий</span>
                         <span><?=count($item->opinions)?> отзывов</span>
                     </div>
                     <div class="feedback-card__top--name user__search-card">
@@ -37,9 +37,9 @@
                     <span class="new-task__time">Был на сайте 25 минут назад</span>
                 </div>
             <div class="link-specialization user__search-link--bottom">
-                <a href="#" class="link-regular">Ремонт</a>
-                <a href="#" class="link-regular">Курьер</a>
-                <a href="#" class="link-regular">Оператор ПК</a>
+                <?php foreach ($item->categories as $category) {?>
+                    <a href="#" class="link-regular"><?=$category->category->name?></a>
+                <?php } ?>
             </div>
         </div>
     <?php } ?>

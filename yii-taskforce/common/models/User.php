@@ -1,6 +1,7 @@
 <?php
 namespace common\models;
 
+use frontend\models\db\Replies;
 use Yii;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
@@ -8,6 +9,8 @@ use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
 use frontend\models\db\Profiles;
 use frontend\models\db\Opinions;
+use frontend\models\db\UsersCategories;
+use frontend\models\db\Tasks;
 
 /**
  * User model
@@ -242,6 +245,24 @@ class User extends ActiveRecord implements IdentityInterface
             $sum += $rating->rate;
         }
         return round($sum / count($ratings), 2);
+    }
+
+    /**
+     * получение категорий юзера
+     */
+    public function getCategories()
+    {
+        return $this->hasMany(UsersCategories::class, ['user_id' => 'id']);
+    }
+
+    /**
+     * получение заданий исполнителя
+     */
+    public function getTasksExecutor()
+    {
+        return Replies::find()
+            ->where(['user_id' => $this->id, 'accept' => 1])
+            ->all();
     }
 
 }

@@ -10,7 +10,7 @@ class UsersController extends \yii\web\Controller
     {
         $modelUser = User::find()
             ->where(['id' => Yii::$app->authManager->getUserIdsByRole('executor')])
-            ->with('profile', 'opinions')
+            ->with('profile', 'opinions', 'categories')
             ->orderBy('id DESC')
             ->all();
 
