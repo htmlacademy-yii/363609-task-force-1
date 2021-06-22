@@ -11,7 +11,7 @@ class UsersController extends \yii\web\Controller
         $modelUser = User::find()
             ->where(['id' => Yii::$app->authManager->getUserIdsByRole('executor')])
             ->with('profile', 'opinions', 'categories')
-            ->orderBy('id DESC')
+            ->orderBy('created_at DESC')
             ->all();
 
         return $this->render('index', compact('modelUser'));

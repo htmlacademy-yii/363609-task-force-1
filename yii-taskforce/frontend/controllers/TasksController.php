@@ -10,7 +10,7 @@ class TasksController extends \yii\web\Controller
         $model = Tasks::find()
             ->where(['status' => Tasks::STATUS_NEW])
             ->with('categories')
-            ->orderBy('id DESC')
+            ->orderBy('dt_add DESC')
             ->all();
 
         return $this->render('index', compact('model'));

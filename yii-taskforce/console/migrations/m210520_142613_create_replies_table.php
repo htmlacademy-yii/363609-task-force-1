@@ -19,7 +19,7 @@ class m210520_142613_create_replies_table extends Migration
             'description' => $this->text(),
             'user_id' => $this->integer(),
             'task_id' => $this->integer(),
-            'accept' => $this->boolean()
+            'status' => $this->tinyInteger(1)
         ]);
     }
 

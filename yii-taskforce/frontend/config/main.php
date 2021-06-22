@@ -43,8 +43,6 @@ return [
             'enableStrictParsing' => false,
             'rules' => [
                 'login' => 'site/login',
-                'users' => 'users/index',
-                'tasks' => 'tasks/index'
             ],
         ],
     ],

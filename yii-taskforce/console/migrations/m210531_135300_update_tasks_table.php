@@ -12,7 +12,7 @@ class m210531_135300_update_tasks_table extends Migration
      */
     public function safeUp()
     {
-        $this->addColumn('tasks', 'status', $this->integer(11)->after('id')->defaultValue(1));
+        $this->addColumn('tasks', 'status', $this->tinyInteger(1)->after('id')->defaultValue(1));
         $this->createIndex('idx-tasks-category_id', '{{%tasks}}', 'category_id');
         $this->addForeignKey(
             'fk-tasks-category_id',

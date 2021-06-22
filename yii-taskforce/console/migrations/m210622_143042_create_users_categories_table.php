@@ -14,8 +14,8 @@ class m210622_143042_create_users_categories_table extends Migration
     {
         $this->createTable('{{%users_categories}}', [
             'id' => $this->primaryKey(),
-            'user_id' => $this->integer(),
-            'category_id' => $this->integer()
+            'user_id' => $this->integer()->notNull(),
+            'category_id' => $this->integer()->notNull()
         ]);
 
         $this->createIndex(

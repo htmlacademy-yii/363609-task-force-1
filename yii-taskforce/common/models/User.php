@@ -236,15 +236,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function getOpinionsRating()
     {
-        $sum = 0;
-        $ratings = Opinions::find()
-            ->where(['user_id' => $this->id])
-            ->select(['rate'])
-            ->all();
-        foreach ($ratings as $rating) {
-            $sum += $rating->rate;
-        }
-        return round($sum / count($ratings), 2);
+        return $this->getOpinions()->average('rate');
     }
 
     /**
@@ -260,8 +252,8 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function getTasksExecutor()
     {
-        return Replies::find()
-            ->where(['user_id' => $this->id, 'accept' => 1])
+        return Tasks::find()
+            ->where(['executor_id' => $this->id])
             ->all();
     }
 

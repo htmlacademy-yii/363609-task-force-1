@@ -29,7 +29,7 @@
                     <div class="feedback-card__top--name user__search-card">
                         <p class="link-name"><a href="#" class="link-regular"><?=$item->name?></a></p>
                         <span></span><span></span><span></span><span></span><span class="star-disabled"></span>
-                        <b><?=$item->opinionsRating?></b>
+                        <b><?=round($item->opinionsRating, 2)?></b>
                         <p class="user__search-content">
                             <?=$item->profile->about?>
                         </p>
