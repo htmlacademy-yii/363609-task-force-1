@@ -22,7 +22,9 @@ class m210520_142624_create_tasks_table extends Migration
             'address' => $this->text(),
             'budget' => $this->integer(11),
             'lat' => $this->double(5,7),
-            'long' => $this->double(5,7)
+            'long' => $this->double(5,7),
+            'customer_id' => $this->integer(11),
+            'executor_id' => $this->integer(11),
         ]);
     }
 

@@ -29,7 +29,7 @@ class Replies extends \yii\db\ActiveRecord
     {
         return [
             [['dt_add'], 'safe'],
-            [['rate'], 'integer'],
+            [['rate', 'user_id', 'task_id', 'accept'], 'integer'],
             [['description'], 'string'],
         ];
     }
