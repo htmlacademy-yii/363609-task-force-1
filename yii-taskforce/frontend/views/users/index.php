@@ -2,23 +2,29 @@
 /* @var $this yii\web\View
  * @var $modelUser \common\models\User
  */
+use yii\widgets\ActiveForm;
+use frontend\models\form\UsersForm;
+use yii\widgets\LinkPager;
+use yii\helpers\Html;
+
+$this->title = 'Исполнители';
 ?>
 <section class="user__search">
     <div class="user__search-link">
         <p>Сортировать по:</p>
         <ul class="user__search-list">
             <li class="user__search-item user__search-item--current">
-                <a href="#" class="link-regular">Рейтингу</a>
+                <a href="?sort=rating" class="link-regular">Рейтингу</a>
             </li>
             <li class="user__search-item">
-                <a href="#" class="link-regular">Числу заказов</a>
+                <a href="?sort=tasks" class="link-regular">Числу заказов</a>
             </li>
             <li class="user__search-item">
-                <a href="#" class="link-regular">Популярности</a>
+                <a href="?sort=review" class="link-regular">Популярности</a>
             </li>
         </ul>
     </div>
-    <?php foreach ($modelUser as $item) {?>
+    <?php foreach ($users as $item) {?>
         <div class="content-view__feedback-card user__search-wrapper">
                 <div class="feedback-card__top">
                     <div class="user__search-icon">
@@ -43,37 +49,61 @@
             </div>
         </div>
     <?php } ?>
+    <div class="new-task__pagination">
+        <?php
+        echo LinkPager::widget([
+            'pagination' => $pages,
+            'options' => [
+                'class' => 'new-task__pagination-list'
+            ],
+            'linkContainerOptions' => [
+                'class' => 'pagination__item',
+            ],
+            'activePageCssClass' => 'pagination__item--current',
+            'prevPageCssClass' => '',
+            'nextPageCssClass' => '',
+            'nextPageLabel' => '',
+            'prevPageLabel' => ''
+        ]);
+        ?>
+    </div>
 </section>
 <section  class="search-task">
     <div class="search-task__wrapper">
-        <form class="search-task__form" name="users" method="post" action="#">
+        <?php $form = ActiveForm::begin([
+            'options' => ['class' => 'search-task__form'],
+        ]) ?>
             <fieldset class="search-task__categories">
                 <legend>Категории</legend>
-                <input class="visually-hidden checkbox__input" id="101" type="checkbox" name="" value="" checked disabled>
-                <label for="101">Курьерские услуги </label>
-                <input class="visually-hidden checkbox__input" id="102" type="checkbox" name="" value="" checked>
-                <label  for="102">Грузоперевозки </label>
-                <input class="visually-hidden checkbox__input" id="103" type="checkbox" name="" value="">
-                <label  for="103">Переводы </label>
-                <input class="visually-hidden checkbox__input" id="104" type="checkbox" name="" value="">
-                <label  for="104">Строительство и ремонт </label>
-                <input class="visually-hidden checkbox__input" id="105" type="checkbox" name="" value="">
-                <label  for="105">Выгул животных </label>
+                <?=Html::activeCheckboxList($model, 'categories', $arCategories, ['tag' => false, 'value' => $post['categories']??'',
+                    'item' => function ($index, $label, $name, $checked, $value) {
+                        $checked = $checked ? 'checked' : '';
+                        return
+                            "
+                   <input type='checkbox' class='visually-hidden checkbox__input'  name='{$name}' value='{$value}' {$checked} id='categories-{$index}'>
+                   <label for='categories-{$index}'>
+                    {$label}
+                    </label>
+                    ";
+                    }])?>
             </fieldset>
             <fieldset class="search-task__categories">
                 <legend>Дополнительно</legend>
-                <input class="visually-hidden checkbox__input" id="106" type="checkbox" name="" value="" disabled>
-                <label for="106">Сейчас свободен</label>
-                <input class="visually-hidden checkbox__input" id="107" type="checkbox" name="" value="" checked>
-                <label for="107">Сейчас онлайн</label>
-                <input class="visually-hidden checkbox__input" id="108" type="checkbox" name="" value="" checked>
-                <label for="108">Есть отзывы</label>
-                <input class="visually-hidden checkbox__input" id="109" type="checkbox" name="" value="" checked>
-                <label for="109">В избранном</label>
+                <?=Html::activeCheckboxList($model, 'additionals', UsersForm::AR_ADDITIONALS, ['tag' => false, 'value' => $post['additionals']??'',
+                    'item' => function ($index, $label, $name, $checked, $value) {
+                        $checked = $checked ? 'checked' : '';
+                        return
+                            "
+                   <input type='checkbox' class='visually-hidden checkbox__input'  name='{$name}' value='{$value}' {$checked} id='additionals-{$index}'>
+                   <label for='additionals-{$index}'>
+                    {$label}
+                    </label>
+                    ";
+                    }])?>
             </fieldset>
-            <label class="search-task__name" for="110">Поиск по имени</label>
-            <input class="input-middle input" id="110" type="search" name="q" placeholder="">
-            <button class="button" type="submit">Искать</button>
-        </form>
+        <?=Html::activeLabel($model, 'name', ['class' => 'search-task__name'])?>
+        <?=Html::activeInput('search', $model, 'name', ['class' => 'input-middle input'])?>
+        <?=Html::button('Искать', ['class' => 'button', 'type' => 'submit'])?>
+        <?php ActiveForm::end() ?>
     </div>
 </section>
