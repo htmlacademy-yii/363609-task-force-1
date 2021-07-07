@@ -4,6 +4,8 @@ namespace frontend\models\db;
 
 use Yii;
 use frontend\models\db\Categories;
+use frontend\models\db\Cities;
+use frontend\models\db\Replies;
 
 /**
  * This is the model class for table "tasks".
@@ -54,7 +56,7 @@ class Tasks extends \yii\db\ActiveRecord
     {
         return [
             [['dt_add', 'expire'], 'date', 'format' => 'php:Y-m-d'],
-            [['category_id', 'budget', 'status'], 'integer'],
+            [['category_id', 'budget', 'status', 'city_id'], 'integer'],
             [['description', 'address'], 'string'],
             [['lat', 'long'], 'number'],
             [['name'], 'string', 'max' => 255],
@@ -83,5 +85,15 @@ class Tasks extends \yii\db\ActiveRecord
     public function getCategories()
     {
         return $this->hasOne(Categories::class, ['id' => 'category_id']);
+    }
+
+    public function getCity()
+    {
+        return $this->hasOne(Cities::class, ['id' => 'city']);
+    }
+
+    public function getReplies()
+    {
+        return $this->hasMany(Replies::class, ['task_id' => 'id']);
     }
 }

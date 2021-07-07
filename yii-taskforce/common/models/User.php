@@ -2,6 +2,7 @@
 namespace common\models;
 
 use frontend\models\db\Replies;
+use frontend\models\db\UserFavorites;
 use Yii;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
@@ -252,9 +253,15 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function getTasksExecutor()
     {
-        return Tasks::find()
-            ->where(['executor_id' => $this->id])
-            ->all();
+        return $this->hasMany(Tasks::class, ['executor_id' => 'id']);
+    }
+
+    /**
+     * получение избранных исполнителей
+     */
+    public function getFavorites()
+    {
+        return $this->hasMany(UserFavorites::class, ['user_id' => 'id']);
     }
 
 }

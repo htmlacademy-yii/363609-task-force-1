@@ -25,6 +25,7 @@ class m210520_142624_create_tasks_table extends Migration
             'long' => $this->double(5,7),
             'customer_id' => $this->integer(11),
             'executor_id' => $this->integer(11),
+            'city_id' => $this->integer(11)
         ]);
     }
 

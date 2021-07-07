@@ -1,19 +1,27 @@
 <?php
 namespace frontend\controllers;
 
-use frontend\models\db\Tasks;
+use Yii;
+use frontend\models\form\TasksForm;
 
 class TasksController extends \yii\web\Controller
 {
     public function actionIndex()
     {
-        $model = Tasks::find()
-            ->where(['status' => Tasks::STATUS_NEW])
-            ->with('categories')
-            ->orderBy('dt_add DESC')
-            ->all();
+        $post = Yii::$app->request->post();
+        $model = new TasksForm();
+        $model->load($post);
 
-        return $this->render('index', compact('model'));
+        $dataProvider = $model->getDataProvider();
+        $dataProvider->setTotalCount($dataProvider->getCount());
+        $dataProvider->setPagination(['totalCount' => $dataProvider->getCount()]);
+
+        return $this->render('index',
+            [
+                'model' => $model,
+                'post' => $post['TasksForm']??'',
+                'dataProvider' => $dataProvider
+            ]);
     }
 
 }

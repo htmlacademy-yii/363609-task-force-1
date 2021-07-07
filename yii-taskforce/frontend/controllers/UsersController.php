@@ -1,20 +1,27 @@
 <?php
-
 namespace frontend\controllers;
+
 use Yii;
-use common\models\User;
+use frontend\models\form\UsersForm;
 
 class UsersController extends \yii\web\Controller
 {
     public function actionIndex()
     {
-        $modelUser = User::find()
-            ->where(['id' => Yii::$app->authManager->getUserIdsByRole('executor')])
-            ->with('profile', 'opinions', 'categories')
-            ->orderBy('created_at DESC')
-            ->all();
+        $post = Yii::$app->request->post();
+        $model = new UsersForm();
+        $model->load($post);
 
-        return $this->render('index', compact('modelUser'));
+        $dataProvider = $model->getDataProvider();
+        $dataProvider->setTotalCount($dataProvider->getCount());
+        $dataProvider->setPagination(['totalCount' => $dataProvider->getCount()]);
+
+        return $this->render('index',
+            [
+                'model' => $model,
+                'post' => $post['UsersForm']??'',
+                'dataProvider' => $dataProvider
+            ]);
     }
 
 }
