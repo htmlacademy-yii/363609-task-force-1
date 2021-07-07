@@ -4,8 +4,8 @@
  */
 use yii\widgets\ActiveForm;
 use frontend\models\form\UsersForm;
-use yii\widgets\LinkPager;
 use yii\helpers\Html;
+use yii\widgets\ListView;
 
 $this->title = 'Исполнители';
 ?>
@@ -17,42 +17,19 @@ $this->title = 'Исполнители';
                 <a href="?sort=rating" class="link-regular">Рейтингу</a>
             </li>
             <li class="user__search-item">
-                <a href="?sort=tasks" class="link-regular">Числу заказов</a>
+                <a href="" class="link-regular">Числу заказов</a>
             </li>
             <li class="user__search-item">
-                <a href="?sort=review" class="link-regular">Популярности</a>
+                <a href="" class="link-regular">Популярности</a>
             </li>
         </ul>
     </div>
-    <?php foreach ($users as $item) {?>
-        <div class="content-view__feedback-card user__search-wrapper">
-                <div class="feedback-card__top">
-                    <div class="user__search-icon">
-                        <a href="#"><img src="<?=$item->photo?>" width="65" height="65"></a>
-                        <span><?=count($item->tasksExecutor)?> заданий</span>
-                        <span><?=count($item->opinions)?> отзывов</span>
-                    </div>
-                    <div class="feedback-card__top--name user__search-card">
-                        <p class="link-name"><a href="#" class="link-regular"><?=$item->name?></a></p>
-                        <span></span><span></span><span></span><span></span><span class="star-disabled"></span>
-                        <b><?=round($item->opinionsRating, 2)?></b>
-                        <p class="user__search-content">
-                            <?=$item->profile->about?>
-                        </p>
-                    </div>
-                    <span class="new-task__time">Был на сайте 25 минут назад</span>
-                </div>
-            <div class="link-specialization user__search-link--bottom">
-                <?php foreach ($item->categories as $category) {?>
-                    <a href="#" class="link-regular"><?=$category->category->name?></a>
-                <?php } ?>
-            </div>
-        </div>
-    <?php } ?>
-    <div class="new-task__pagination">
-        <?php
-        echo LinkPager::widget([
-            'pagination' => $pages,
+    <?php
+    echo ListView::widget([
+        'dataProvider' => $dataProvider,
+        'itemView' => 'user',
+        'layout' => '{items}<div class="new-task__pagination">{pager}</div>',
+        'pager' => [
             'options' => [
                 'class' => 'new-task__pagination-list'
             ],
@@ -63,10 +40,10 @@ $this->title = 'Исполнители';
             'prevPageCssClass' => '',
             'nextPageCssClass' => '',
             'nextPageLabel' => '',
-            'prevPageLabel' => ''
-        ]);
-        ?>
-    </div>
+            'prevPageLabel' => '',
+        ],
+    ]);
+    ?>
 </section>
 <section  class="search-task">
     <div class="search-task__wrapper">
@@ -75,7 +52,7 @@ $this->title = 'Исполнители';
         ]) ?>
             <fieldset class="search-task__categories">
                 <legend>Категории</legend>
-                <?=Html::activeCheckboxList($model, 'categories', $arCategories, ['tag' => false, 'value' => $post['categories']??'',
+                <?=Html::activeCheckboxList($model, 'categories', $model->getCategoriesList(), ['tag' => false, 'value' => $post['categories']??'',
                     'item' => function ($index, $label, $name, $checked, $value) {
                         $checked = $checked ? 'checked' : '';
                         return

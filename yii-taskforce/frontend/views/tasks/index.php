@@ -6,43 +6,31 @@ use yii\widgets\ActiveForm;
 use yii\widgets\LinkPager;
 use yii\helpers\Html;
 use frontend\models\form\TasksForm;
+use yii\widgets\ListView;
 
 $this->title = 'Новые задания';
 ?>
 <section class="new-task">
     <div class="new-task__wrapper">
         <h1><?=$this->title?></h1>
-        <?php foreach ($tasks as $item) {?>
-            <div class="new-task__card">
-                <div class="new-task__title">
-                    <a href="<?=$item->id?>" class="link-regular"><h2><?=$item->name?></h2></a>
-                    <a  class="new-task__type link-regular" href="#"><p><?=$item->categories->name?></p></a>
-                </div>
-                <div class="new-task__icon new-task__icon--<?=$item->categories->icon?>"></div>
-                <p class="new-task_description">
-                    <?=$item->description?>
-                </p>
-                <b class="new-task__price new-task__price--translation"><?=$item->budget?><b> ₽</b></b>
-                <p class="new-task__place"><?=$item->address?></p>
-                <span class="new-task__time"><?=$item->dt_add?></span>
-            </div>
-        <?php } ?>
-    </div>
-    <div class="new-task__pagination">
         <?php
-        echo LinkPager::widget([
-            'pagination' => $pages,
-            'options' => [
-                'class' => 'new-task__pagination-list'
+        echo ListView::widget([
+            'dataProvider' => $dataProvider,
+            'itemView' => 'task',
+            'layout' => '{items}<div class="new-task__pagination">{pager}</div>',
+            'pager' => [
+                'options' => [
+                    'class' => 'new-task__pagination-list'
+                ],
+                'linkContainerOptions' => [
+                    'class' => 'pagination__item',
+                ],
+                'activePageCssClass' => 'pagination__item--current',
+                'prevPageCssClass' => '',
+                'nextPageCssClass' => '',
+                'nextPageLabel' => '',
+                'prevPageLabel' => '',
             ],
-            'linkContainerOptions' => [
-                'class' => 'pagination__item',
-            ],
-            'activePageCssClass' => 'pagination__item--current',
-            'prevPageCssClass' => '',
-            'nextPageCssClass' => '',
-            'nextPageLabel' => '',
-            'prevPageLabel' => ''
         ]);
         ?>
     </div>
@@ -54,7 +42,7 @@ $this->title = 'Новые задания';
         ]) ?>
             <fieldset class="search-task__categories">
                 <legend>Категории</legend>
-                <?=Html::activeCheckboxList($model, 'categories', $arCategories, ['tag' => false, 'value' => $post['categories']??'',
+                <?=Html::activeCheckboxList($model, 'categories', $model->getCategoriesList(), ['tag' => false, 'value' => $post['categories']??'',
                     'item' => function ($index, $label, $name, $checked, $value) {
                         $checked = $checked ? 'checked' : '';
                     return
