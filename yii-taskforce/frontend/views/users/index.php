@@ -17,10 +17,10 @@ $this->title = 'Исполнители';
                 <a href="?sort=rating" class="link-regular">Рейтингу</a>
             </li>
             <li class="user__search-item">
-                <a href="" class="link-regular">Числу заказов</a>
+                <a href="?sort=tasks" class="link-regular">Числу заказов</a>
             </li>
             <li class="user__search-item">
-                <a href="" class="link-regular">Популярности</a>
+                <a href="?sort=review" class="link-regular">Популярности</a>
             </li>
         </ul>
     </div>
@@ -48,11 +48,13 @@ $this->title = 'Исполнители';
 <section  class="search-task">
     <div class="search-task__wrapper">
         <?php $form = ActiveForm::begin([
+            'method' => 'get',
             'options' => ['class' => 'search-task__form'],
+            'action' => ['users/index']
         ]) ?>
             <fieldset class="search-task__categories">
                 <legend>Категории</legend>
-                <?=Html::activeCheckboxList($model, 'categories', $model->getCategoriesList(), ['tag' => false, 'value' => $post['categories']??'',
+                <?=Html::activeCheckboxList($model, 'categories', $model->getCategoriesList(), ['tag' => false, 'value' => $get['categories']??'',
                     'item' => function ($index, $label, $name, $checked, $value) {
                         $checked = $checked ? 'checked' : '';
                         return
@@ -66,17 +68,14 @@ $this->title = 'Исполнители';
             </fieldset>
             <fieldset class="search-task__categories">
                 <legend>Дополнительно</legend>
-                <?=Html::activeCheckboxList($model, 'additionals', UsersForm::AR_ADDITIONALS, ['tag' => false, 'value' => $post['additionals']??'',
-                    'item' => function ($index, $label, $name, $checked, $value) {
-                        $checked = $checked ? 'checked' : '';
-                        return
-                            "
-                   <input type='checkbox' class='visually-hidden checkbox__input'  name='{$name}' value='{$value}' {$checked} id='additionals-{$index}'>
-                   <label for='additionals-{$index}'>
-                    {$label}
-                    </label>
-                    ";
-                    }])?>
+                <?=Html::activeCheckbox($model, 'free', ['class' => 'visually-hidden checkbox__input', 'label' => false])?>
+                <?=Html::activeLabel($model, 'free')?>
+                <?=Html::activeCheckbox($model, 'online', ['class' => 'visually-hidden checkbox__input', 'label' => false])?>
+                <?=Html::activeLabel($model, 'online')?>
+                <?=Html::activeCheckbox($model, 'haveReviews', ['class' => 'visually-hidden checkbox__input', 'label' => false])?>
+                <?=Html::activeLabel($model, 'haveReviews')?>
+                <?=Html::activeCheckbox($model, 'favorites', ['class' => 'visually-hidden checkbox__input', 'label' => false])?>
+                <?=Html::activeLabel($model, 'favorites')?>
             </fieldset>
         <?=Html::activeLabel($model, 'name', ['class' => 'search-task__name'])?>
         <?=Html::activeInput('search', $model, 'name', ['class' => 'input-middle input'])?>

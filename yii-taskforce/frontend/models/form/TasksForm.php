@@ -9,13 +9,6 @@ use yii\data\ActiveDataProvider;
 
 class TasksForm extends Model
 {
-    public const NOT_RESPONSE = 1;
-    public const DISTANT_WORK = 2;
-    public const AR_ADDITIONALS = [
-        self::NOT_RESPONSE => 'Без откликов',
-        self::DISTANT_WORK => 'Удалённая работа'
-    ];
-
     public const PERIOD_DEFAULT = 0;
     public const PERIOD_DAY = 1;
     public const PERIOD_WEEK = 7;
@@ -28,15 +21,17 @@ class TasksForm extends Model
     ];
 
     public $categories;
-    public $additionals;
     public $period;
     public $name;
+    public $notResponse;
+    public $distantWork;
+
 
     public function rules()
     {
         return [
             [['categories'], 'safe'],
-            [['additionals', 'period'], 'integer'],
+            [['notResponse', 'distantWork', 'period'], 'integer'],
             [['name'], 'string'],
         ];
     }
@@ -44,9 +39,10 @@ class TasksForm extends Model
     public function attributeLabels() {
         return [
             'categories' => 'Категории',
-            'additionals' => 'Дополнительно',
             'period' => 'Период',
             'name' => 'Поиск по названию',
+            'notResponse' => 'Без откликов',
+            'distantWork' => 'Удалённая работа',
         ];
     }
 
@@ -64,31 +60,26 @@ class TasksForm extends Model
 
         $query->where(['tasks.status' => Tasks::STATUS_NEW]);
 
-       // var_dump($this->categories);
-
         $query->andFilterWhere(['tasks.category_id' => $this->categories]);
 
         $query->andFilterWhere([
                 'like', 'tasks.name', $this->name,
             ]);
 
-        if(!empty($this->additionals)) {
-            if(in_array(self::NOT_RESPONSE, $this->additionals) && in_array(self::AR_ADDITIONALS, $this->additionals)) {
-                $query->joinWith('replies');
-                $query->andWhere(['or', ['replies.id' => null], ['city_id' => null]]);
-            }
-            elseif(in_array(self::NOT_RESPONSE, $this->additionals)) {
-                $query->joinWith('replies');
-                $query->andWhere(['replies.id' => null]);
-            }
-            elseif(in_array(self::DISTANT_WORK, $this->additionals)) {
-                $query->andWhere(['city_id' => null]);
-            }
+        if(!empty($this->notResponse)) {
+            $query->joinWith('replies');
+            $query->andWhere(['replies.id' => null]);
+        }
+
+        if(!empty($this->distantWork)) {
+            $query->andWhere(['city_id' => null]);
         }
 
         if(!empty($this->period)) {
             $query->andWhere('DATE(dt_add) >= DATE(NOW() - INTERVAL :period DAY)', ['period' => $this->period]);
         }
+
+        $query->groupBy('tasks.id');
 
         return new ActiveDataProvider([
             'query' => $query,

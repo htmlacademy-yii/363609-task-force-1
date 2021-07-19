@@ -2,34 +2,29 @@
 namespace frontend\models\form;
 
 use common\models\User;
+use frontend\models\db\UserFavorites;
 use yii\base\Model;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\data\ActiveDataProvider;
 use frontend\models\db\Categories;
+use yii\db\ActiveQuery;
 
 class UsersForm extends Model
 {
-    public const FREE = 1;
-    public const ONLINE = 2;
-    public const HAVE_REVIEWS = 3;
-    public const FAVORITES = 4;
-    public const AR_ADDITIONALS = [
-        self::FREE => 'Сейчас свободен',
-        self::ONLINE => 'Сейчас онлайн',
-        self::HAVE_REVIEWS => 'Есть отзывы',
-        self::FAVORITES => 'В избранном'
-    ];
-
     public $categories;
-    public $additionals;
     public $name;
+    public $free;
+    public $online;
+    public $haveReviews;
+    public $favorites;
 
     public function rules()
     {
         return [
-            [['categories', 'additionals'], 'safe'],
+            [['categories'], 'safe'],
             [['name'], 'string'],
+            [['free', 'online', 'haveReviews', 'favorites'], 'integer']
         ];
     }
 
@@ -38,6 +33,10 @@ class UsersForm extends Model
             'categories' => 'Категории',
             'additionals' => 'Дополнительно',
             'name' => 'Поиск по названию',
+            'free' => 'Сейчас свободен',
+            'online' => 'Сейчас онлайн',
+            'haveReviews' => 'Есть отзывы',
+            'favorites' => 'В избранном',
         ];
     }
 
@@ -51,30 +50,71 @@ class UsersForm extends Model
 
     public function getDataProvider()
     {
-        $query = User::find()->where(['users.id' => Yii::$app->authManager->getUserIdsByRole('executor')])->with('profile')->joinWith(['categories', 'opinions', 'tasksExecutor', 'favorites']);
+        if ($sort = Yii::$app->request->get('sort')) {
+            $sortDirection = substr($sort, 0, 1) === '-'?'SORT_DESC' : 'SORT_ASC';
 
-        $query->andFilterWhere(['users_categories.category_id' => $this->categories]);
-        $query->andFilterWhere([
-            'like', 'users.name', $this->name,
-        ]);
-
-        if(!empty($this->additionals)) {
-
-            $ar = [];
-
-            if(in_array(UsersForm::FREE, $this->additionals)) {
-                $ar[] = 'users.id NOT IN (SELECT executor_id FROM tasks)';
-            }
-            if(in_array(UsersForm::HAVE_REVIEWS, $this->additionals)) {
-                $ar[] = 'users.id IN (SELECT user_id FROM opinions)';
-            }
-            if(in_array(UsersForm::FAVORITES, $this->additionals)) {
-                $ar[] = 'users.id IN (SELECT user_id FROM user_favorites)';
-            }
-
-            $query->andWhere(implode(' OR ', $ar));
-
+        $query = User::find()
+            ->alias('u')
+            ->where(['u.id' => Yii::$app->authManager->getUserIdsByRole('executor')])
+            ->select(['u.*', 'COUNT(opinions.id)', 'COUNT(tasks.id)'])
+            ->with('profile')
+            ->joinWith([
+                'categories',
+                'tasksExecutor' => function (ActiveQuery $query) use ($sortDirection) {
+                    $query->orderBy(['COUNT(tasks.id)' => $sortDirection]);
+                },
+                'opinions' => function (ActiveQuery $query) use ($sortDirection) {
+                    $query->orderBy(['COUNT(opinions.id)' => $sortDirection]);
+                },
+                'favorites',
+            ]);
         }
+        else {
+
+            $query = User::find()
+                ->alias('u')
+                ->where(['u.id' => Yii::$app->authManager->getUserIdsByRole('executor')])
+                ->select(['u.*'])
+                ->with('profile')
+                ->joinWith([
+                    'categories',
+                    'favorites',
+                    'tasksExecutor',
+//                    'tasksExecutor' => function (ActiveQuery $query) {
+//                       // $query->orderBy(['COUNT(tasks.id)' => 'SORT_DESC']);
+//                    },
+                    'opinions'
+//                    'opinions' => function (ActiveQuery $query) {
+//                       // $query->orderBy(['COUNT(opinions.id)' => 'SORT_DESC']);
+//                    }
+                ]);
+
+            if(!empty($this->free)) {
+                $query->andWhere('u.id NOT IN (SELECT executor_id FROM tasks)');
+            }
+            if(!empty($this->haveReviews)) {
+                $query->andWhere('u.id IN (SELECT user_id FROM opinions)');
+            }
+            if(!empty($this->favorites)) {
+                $idFavorites = UserFavorites::find()
+                    ->where(['user_id' => Yii::$app->user->identity->id])
+                    ->select(['favorite_id'])
+                    ->asArray()
+                    ->all();
+
+                $query->andWhere(['u.id' => $idFavorites]);
+            }
+            if(!empty($this->online)) {
+                $query->andWhere('u.last_activity > TIMESTAMP(NOW() - INTERVAL :period MINUTE)', ['period' => 30]);
+            }
+
+            $query->andFilterWhere(['users_categories.category_id' => $this->categories]);
+            $query->andFilterWhere([
+                'like', 'users.name', $this->name,
+            ]);
+        }
+
+        $query->groupBy(['u.id']);
 
         return new ActiveDataProvider([
             'query' => $query,
@@ -82,8 +122,8 @@ class UsersForm extends Model
                 'defaultOrder' => ['create' => SORT_DESC],
                 'attributes' => [
                     'create' => [
-                        'asc' => ['users.created_at' => SORT_ASC],
-                        'desc' => ['users.created_at' => SORT_DESC],
+                        'asc' => ['u.created_at' => SORT_ASC],
+                        'desc' => ['u.created_at' => SORT_DESC],
                         'default' => SORT_DESC
                     ],
                     'rating' => [

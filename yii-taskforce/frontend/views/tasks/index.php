@@ -38,11 +38,13 @@ $this->title = 'Новые задания';
 <section  class="search-task">
     <div class="search-task__wrapper">
         <?php $form = ActiveForm::begin([
+            'method' => 'get',
             'options' => ['class' => 'search-task__form'],
+            'action' => ['tasks/index']
         ]) ?>
             <fieldset class="search-task__categories">
                 <legend>Категории</legend>
-                <?=Html::activeCheckboxList($model, 'categories', $model->getCategoriesList(), ['tag' => false, 'value' => $post['categories']??'',
+                <?=Html::activeCheckboxList($model, 'categories', $model->getCategoriesList(), ['tag' => false, 'value' => $get['categories']??'',
                     'item' => function ($index, $label, $name, $checked, $value) {
                         $checked = $checked ? 'checked' : '';
                     return
@@ -56,21 +58,14 @@ $this->title = 'Новые задания';
             </fieldset>
             <fieldset class="search-task__categories">
                 <legend>Дополнительно</legend>
-                <?=Html::activeCheckboxList($model, 'additionals', TasksForm::AR_ADDITIONALS, ['tag' => false, 'value' => $post['additionals']??'',
-                    'item' => function ($index, $label, $name, $checked, $value) {
-                        $checked = $checked ? 'checked' : '';
-                        return
-                            "
-                   <input type='checkbox' class='visually-hidden checkbox__input'  name='{$name}' value='{$value}' {$checked} id='additionals-{$index}'>
-                   <label for='additionals-{$index}'>
-                    {$label}
-                    </label>
-                    ";
-                    }])?>
+                <?=Html::activeCheckbox($model, 'notResponse', ['class' => 'visually-hidden checkbox__input', 'label' => false])?>
+                <?=Html::activeLabel($model, 'notResponse')?>
+                <?=Html::activeCheckbox($model, 'distantWork', ['class' => 'visually-hidden checkbox__input', 'label' => false])?>
+                <?=Html::activeLabel($model, 'distantWork')?>
             </fieldset>
             <?=Html::activeLabel($model, 'period', ['class' => 'search-task__name'])?>
             <?=Html::activeDropDownList($model, 'period', TasksForm::AR_PERIOD,
-                ['class' => 'multiple-select input', 'size' => '1','value' => $post['period']??''])?>
+                ['class' => 'multiple-select input', 'size' => '1','value' => $get['period']??''])?>
 
             <?=Html::activeLabel($model, 'name', ['class' => 'search-task__name'])?>
             <?=Html::activeInput('search', $model, 'name', ['class' => 'input-middle input'])?>

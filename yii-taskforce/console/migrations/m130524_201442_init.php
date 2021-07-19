@@ -23,7 +23,8 @@ class m130524_201442_init extends Migration
             'created_at' => $this->integer()->notNull(),
             'updated_at' => $this->integer()->notNull(),
             'dt_add' => $this->date(),
-            'photo' => $this->string(255)
+            'photo' => $this->string(255),
+            'last_activity' => $this->dateTime()
         ], $tableOptions);
     }
 

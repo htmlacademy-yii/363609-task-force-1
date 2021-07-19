@@ -8,19 +8,15 @@ class UsersController extends \yii\web\Controller
 {
     public function actionIndex()
     {
-        $post = Yii::$app->request->post();
+        $get = Yii::$app->request->get();
         $model = new UsersForm();
-        $model->load($post);
-
-        $dataProvider = $model->getDataProvider();
-        $dataProvider->setTotalCount($dataProvider->getCount());
-        $dataProvider->setPagination(['totalCount' => $dataProvider->getCount()]);
+        $model->load($get);
 
         return $this->render('index',
             [
                 'model' => $model,
-                'post' => $post['UsersForm']??'',
-                'dataProvider' => $dataProvider
+                'get' => $get['UsersForm']??'',
+                'dataProvider' => $model->getDataProvider()
             ]);
     }
 
