@@ -2,6 +2,7 @@
 
 namespace frontend\models\db;
 
+use common\models\User;
 use Yii;
 
 /**
@@ -45,5 +46,10 @@ class Replies extends \yii\db\ActiveRecord
             'rate' => 'Rate',
             'description' => 'Description',
         ];
+    }
+
+    public function getUser()
+    {
+        return $this->hasOne(User::class, ['id' => 'user_id']);
     }
 }

@@ -3,6 +3,7 @@ namespace common\models;
 
 use frontend\models\db\Replies;
 use frontend\models\db\UserFavorites;
+use frontend\models\db\UserFiles;
 use Yii;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
@@ -262,6 +263,22 @@ class User extends ActiveRecord implements IdentityInterface
     public function getFavorites()
     {
         return $this->hasMany(UserFavorites::class, ['user_id' => 'id']);
+    }
+
+    /**
+     * получение заданий заказчика
+     */
+    public function getTasksCustomer()
+    {
+        return $this->hasMany(Tasks::class, ['customer_id' => 'id']);
+    }
+
+    /**
+     * получение файлов
+     */
+    public function getFiles()
+    {
+        return $this->hasMany(UserFiles::class, ['id_user' => 'id']);
     }
 
 }

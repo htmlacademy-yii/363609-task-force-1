@@ -17,7 +17,8 @@ class m210520_142540_create_opinions_table extends Migration
             'dt_add' => $this->date(),
             'rate' => $this->integer(10),
             'description' => $this->text(),
-            'user_id' => $this->integer()
+            'user_id' => $this->integer(),
+            'task_id' => $this->integer()
         ]);
     }
 
