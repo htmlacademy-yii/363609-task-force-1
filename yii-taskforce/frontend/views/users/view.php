@@ -17,7 +17,7 @@ $this->title = $model->name;
                     <span></span><span></span><span></span><span></span><span class="star-disabled"></span>
                     <b><?=round($model->opinionsRating, 2)?></b>
                 </div>
-                <b class="done-task">Выполнил <?=$completedTasks?> заказов</b><b class="done-review">Получил <?=count($reviews)?> отзывов</b>
+                <b class="done-task">Выполнил <?=count($model->completedTask)?> заказов</b><b class="done-review">Получил <?=count($model->opinions)?> отзывов</b>
             </div>
             <div class="content-view__headline user__card-bookmark user__card-bookmark--current">
                 <span>Был на сайте 25 минут назад</span>
@@ -31,9 +31,9 @@ $this->title = $model->name;
             <div class="user__card-info">
                 <h3 class="content-view__h3">Специализации</h3>
                 <div class="link-specialization">
-                    <?php foreach ($model->categories as $category) {?>
+                    <?php foreach ($model->categories as $category) :?>
                         <a href="#" class="link-regular"><?=$category->category->name?></a>
-                    <?php } ?>
+                    <?php endforeach; ?>
                 </div>
                 <h3 class="content-view__h3">Контакты</h3>
                 <div class="user__card-link">
@@ -44,17 +44,17 @@ $this->title = $model->name;
             </div>
             <div class="user__card-photo">
                 <h3 class="content-view__h3">Фото работ</h3>
-                <?php foreach ($model->files as $file) {?>
+                <?php foreach ($model->files as $file) :?>
                     <a href="<?=$file->path?>" download><img src="<?=$file->path?>" width="85" height="86" alt="Фото работы"></a>
-                <?php } ?>
+                <?php endforeach; ?>
             </div>
         </div>
     </div>
-    <?php if(!empty($reviews)) {?>
+    <?php if(!empty($model->opinions)) :?>
         <div class="content-view__feedback">
-            <h2>Отзывы<span>(<?=count($reviews)?>)</span></h2>
+            <h2>Отзывы<span>(<?=count($model->opinions)?>)</span></h2>
             <div class="content-view__feedback-wrapper reviews-wrapper">
-                <?php foreach ($reviews as $review) {?>
+                <?php foreach ($model->opinions as $review) :?>
                     <div class="feedback-card__reviews">
                         <p class="link-task link">Задание <a href="<?=Url::to(['tasks/view', 'id' => $review->task->id])?>" class="link-regular">«<?=$review->task->name?>»</a></p>
                         <div class="card__review">
@@ -70,10 +70,10 @@ $this->title = $model->name;
                             </div>
                         </div>
                     </div>
-                <?php } ?>
+                <?php endforeach; ?>
             </div>
         </div>
-    <?php } ?>
+    <?php endif; ?>
 </section>
 <section class="connect-desk">
     <div class="connect-desk__chat">

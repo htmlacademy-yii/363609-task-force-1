@@ -24,7 +24,10 @@ class TasksController extends \yii\web\Controller
 
     public function actionView($id)
     {
-        $model = $this->findModel($id);
+        $model = Tasks::findOne($id);
+        if(empty($model)) {
+            throw new NotFoundHttpException('Задание не найдено');
+        }
 
         $now = new \DateTime(); // текущее время на сервере
         $date = \DateTime::createFromFormat("Y-m-d", $model->customer->dt_add); // задаем дату в любом формате
@@ -39,15 +42,6 @@ class TasksController extends \yii\web\Controller
                 'replies' => $replies
             ]
         );
-    }
-
-    protected function findModel($id)
-    {
-        $model = Tasks::findOne($id);
-        if(empty($model)) {
-            throw new NotFoundHttpException('Задание не найдено');
-        }
-        return $model;
     }
 
 }

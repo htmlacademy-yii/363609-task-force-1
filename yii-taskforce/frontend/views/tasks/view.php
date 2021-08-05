@@ -28,9 +28,9 @@ $this->title = $model->name;
             </div>
             <div class="content-view__attach">
                 <h3 class="content-view__h3">Вложения</h3>
-                <?php foreach ($model->files as $file) {?>
+                <?php foreach ($model->files as $file) :?>
                     <a href="<?=$file->path?>" download><?=$file->name?></a>
-                <?php } ?>
+                <?php endforeach; ?>
             </div>
             <div class="content-view__location">
                 <h3 class="content-view__h3">Расположение</h3>
@@ -59,7 +59,7 @@ $this->title = $model->name;
     <div class="content-view__feedback">
         <h2>Отклики <span>(<?=count($replies)?>)</span></h2>
         <div class="content-view__feedback-wrapper">
-            <?php foreach ($replies as $reply) {?>
+            <?php foreach ($replies as $reply) :?>
                 <div class="content-view__feedback-card">
                     <div class="feedback-card__top">
                         <a href="<?=Url::to(['users/view', 'id' => $reply->user->id])?>"><img src="<?=$reply->user->photo?>" width="55" height="55"></a>
@@ -83,7 +83,7 @@ $this->title = $model->name;
                            type="button">Отказать</a>
                     </div>
                 </div>
-            <?php } ?>
+            <?php endforeach; ?>
         </div>
     </div>
 </section>

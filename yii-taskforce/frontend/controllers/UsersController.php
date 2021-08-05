@@ -24,9 +24,10 @@ class UsersController extends \yii\web\Controller
 
     public function actionView($id)
     {
-        $model = $this->findModel($id);
-
-        $reviews = $model->opinions;
+        $model = User::findOne($id);
+        if(empty($model)) {
+            throw new NotFoundHttpException('Пользователь не найдено');
+        }
 
         $completedTasks = Tasks::find()->where(['status' => Tasks::STATUS_COMPLETED, 'executor_id' => $model->id])->count();
 
@@ -37,20 +38,10 @@ class UsersController extends \yii\web\Controller
         return $this->render('view',
             [
                 'model' => $model,
-                'reviews' => $reviews,
                 'completedTasks' => $completedTasks,
                 'interval' => $interval
             ]
         );
-    }
-
-    protected function findModel($id)
-    {
-        $model = User::findOne($id);
-        if(empty($model)) {
-            throw new NotFoundHttpException('Пользователь не найдено');
-        }
-        return $model;
     }
 
 }

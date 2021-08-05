@@ -281,4 +281,9 @@ class User extends ActiveRecord implements IdentityInterface
         return $this->hasMany(UserFiles::class, ['id_user' => 'id']);
     }
 
+    public function getCompletedTask()
+    {
+        return Tasks::find()->where(['status' => Tasks::STATUS_COMPLETED, 'executor_id' => $this->id])->all();
+    }
+
 }
