@@ -1,6 +1,9 @@
+<?php
+use yii\helpers\Url;
+?>
 <div class="new-task__card">
     <div class="new-task__title">
-        <a href="<?=$model->id?>" class="link-regular"><h2><?=$model->name?></h2></a>
+        <a href="<?=Url::to(['tasks/view', 'id' => $model->id])?>" class="link-regular"><h2><?=$model->name?></h2></a>
         <a  class="new-task__type link-regular" href="#"><p><?=$model->categories->name?></p></a>
     </div>
     <div class="new-task__icon new-task__icon--<?=$model->categories->icon?>"></div>

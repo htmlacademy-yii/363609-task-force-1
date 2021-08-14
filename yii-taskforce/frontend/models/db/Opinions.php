@@ -2,7 +2,9 @@
 
 namespace frontend\models\db;
 
+use common\models\User;
 use Yii;
+use frontend\models\db\Tasks;
 
 /**
  * This is the model class for table "opinions".
@@ -29,7 +31,7 @@ class Opinions extends \yii\db\ActiveRecord
     {
         return [
             [['dt_add'], 'safe'],
-            [['rate'], 'integer'],
+            [['rate', 'task_id', 'user_id'], 'integer'],
             [['description'], 'string'],
         ];
     }
@@ -45,5 +47,15 @@ class Opinions extends \yii\db\ActiveRecord
             'rate' => 'Rate',
             'description' => 'Description',
         ];
+    }
+
+    public function getUser()
+    {
+        return $this->hasOne(User::class, ['id' => 'user_id']);
+    }
+
+    public function getTask()
+    {
+        return $this->hasOne(Tasks::class, ['id' => 'task_id']);
     }
 }

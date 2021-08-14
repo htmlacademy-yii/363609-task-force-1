@@ -2,10 +2,12 @@
 
 namespace frontend\models\db;
 
+use common\models\User;
 use Yii;
 use frontend\models\db\Categories;
 use frontend\models\db\Cities;
 use frontend\models\db\Replies;
+use frontend\models\db\TasksFiles;
 
 /**
  * This is the model class for table "tasks".
@@ -96,4 +98,20 @@ class Tasks extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Replies::class, ['task_id' => 'id']);
     }
+
+    public function getCustomer()
+    {
+        return $this->hasOne(User::class, ['id' => 'customer_id']);
+    }
+
+    public function getFiles()
+    {
+        return $this->hasMany(TasksFiles::class, ['id_task' => 'id']);
+    }
+
+    public function getUser()
+    {
+        return $this->hasOne(User::class, ['id' => 'customer_id']);
+    }
+
 }
