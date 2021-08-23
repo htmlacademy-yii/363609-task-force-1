@@ -24,7 +24,8 @@ class m130524_201442_init extends Migration
             'updated_at' => $this->integer()->notNull(),
             'dt_add' => $this->date(),
             'photo' => $this->string(255),
-            'last_activity' => $this->dateTime()
+            'last_activity' => $this->dateTime(),
+            'city' => $this->integer()
         ], $tableOptions);
     }
 

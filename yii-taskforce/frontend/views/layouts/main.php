@@ -5,6 +5,7 @@
 
 use yii\helpers\Html;
 use frontend\assets\AppAsset;
+use yii\widgets\Menu;
 
 AppAsset::register($this);
 ?>
@@ -54,69 +55,72 @@ AppAsset::register($this);
                 </a>
             </div>
             <div class="header__nav">
-                <ul class="header-nav__list site-list">
-                    <li class="site-list__item">
-                        <a href="#">Задания</a>
-                    </li>
-                    <li class="site-list__item">
-                        <a href="#">Исполнители</a>
-                    </li>
-                    <li class="site-list__item">
-                        <a href="#">Создать задание</a>
-                    </li>
-                    <li class="site-list__item">
-                        <a>Мой профиль</a>
-                    </li>
-                </ul>
+                <?php
+                echo Menu::widget([
+                    'items' => [
+                        ['label' => 'Задания', 'url' => ['/'], 'options' => ['class' => 'site-list__item']],
+                        ['label' => 'Исполнители', 'url' => ['/'], 'options' => ['class' => 'site-list__item']],
+                        ['label' => 'Создать задание', 'url' => ['/'], 'options' => ['class' => 'site-list__item']],
+                        ['label' => 'Мой профиль', 'url' => ['/'], 'options' => ['class' => 'site-list__item'], 'visible' => !Yii::$app->user->isGuest],
+                        ['label' => 'Авторизация', 'url' => ['site/login'], 'options' => ['class' => 'site-list__item'], 'visible' => Yii::$app->user->isGuest],
+                        ['label' => 'Регистрация', 'url' => ['registration/index'], 'options' => ['class' => 'site-list__item'], 'visible' => Yii::$app->user->isGuest],
+                    ],
+                    'options' => [
+                        'class' => 'header-nav__list site-list',
+                    ],
+                ]);
+                ?>
             </div>
-            <div class="header__town">
-                <select class="multiple-select input town-select" size="1" name="town[]">
-                    <option value="Moscow">Москва</option>
-                    <option selected value="SPB">Санкт-Петербург</option>
-                    <option value="Krasnodar">Краснодар</option>
-                    <option value="Irkutsk">Иркутск</option>
-                    <option value="Vladivostok">Владивосток</option>
-                </select>
-            </div>
-            <div class="header__lightbulb"></div>
-            <div class="lightbulb__pop-up">
-                <h3>Новые события</h3>
-                <p class="lightbulb__new-task lightbulb__new-task--message">
-                    Новое сообщение в чате
-                    <a href="#" class="link-regular">«Помочь с курсовой»</a>
-                </p>
-                <p class="lightbulb__new-task lightbulb__new-task--executor">
-                    Выбран исполнитель для
-                    <a href="#" class="link-regular">«Помочь с курсовой»</a>
-                </p>
-                <p class="lightbulb__new-task lightbulb__new-task--close">
-                    Завершено задание
-                    <a href="#" class="link-regular">«Помочь с курсовой»</a>
-                </p>
-            </div>
-            <div class="header__account">
-                <a class="header__account-photo">
-                    <img src="./img/user-photo.png"
-                         width="43" height="44"
-                         alt="Аватар пользователя">
-                </a>
-                <span class="header__account-name">
-                 Василий
-                </span>
-            </div>
-            <div class="account__pop-up">
-                <ul class="account__pop-up-list">
-                    <li>
-                        <a href="#">Мои задания</a>
-                    </li>
-                    <li>
-                        <a href="#">Настройки</a>
-                    </li>
-                    <li>
-                        <a href="#">Выход</a>
-                    </li>
-                </ul>
-            </div>
+            <?php if(!Yii::$app->user->isGuest) {?>
+                <div class="header__town">
+                    <select class="multiple-select input town-select" size="1" name="town[]">
+                        <option value="Moscow">Москва</option>
+                        <option selected value="SPB">Санкт-Петербург</option>
+                        <option value="Krasnodar">Краснодар</option>
+                        <option value="Irkutsk">Иркутск</option>
+                        <option value="Vladivostok">Владивосток</option>
+                    </select>
+                </div>
+                <div class="header__lightbulb"></div>
+                <div class="lightbulb__pop-up">
+                    <h3>Новые события</h3>
+                    <p class="lightbulb__new-task lightbulb__new-task--message">
+                        Новое сообщение в чате
+                        <a href="#" class="link-regular">«Помочь с курсовой»</a>
+                    </p>
+                    <p class="lightbulb__new-task lightbulb__new-task--executor">
+                        Выбран исполнитель для
+                        <a href="#" class="link-regular">«Помочь с курсовой»</a>
+                    </p>
+                    <p class="lightbulb__new-task lightbulb__new-task--close">
+                        Завершено задание
+                        <a href="#" class="link-regular">«Помочь с курсовой»</a>
+                    </p>
+                </div>
+                <div class="header__account">
+                    <a class="header__account-photo">
+                        <img src="<?=Yii::$app->user->identity->photo?>"
+                             width="43" height="44"
+                             alt="<?=Yii::$app->user->identity->name?>">
+                    </a>
+                    <span class="header__account-name">
+                     <?=Yii::$app->user->identity->name?>
+                    </span>
+                </div>
+                <div class="account__pop-up">
+                    <ul class="account__pop-up-list">
+                        <li>
+                            <a href="#">Мои задания</a>
+                        </li>
+                        <li>
+                            <a href="#">Настройки</a>
+                        </li>
+                        <li>
+                            <a href="#">Выход</a>
+                        </li>
+                    </ul>
+                </div>
+            <?php } ?>
         </div>
     </header>
     <main class="page-main">
