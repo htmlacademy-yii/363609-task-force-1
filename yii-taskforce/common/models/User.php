@@ -27,6 +27,8 @@ use frontend\models\db\Tasks;
  * @property integer $status
  * @property integer $created_at
  * @property integer $updated_at
+ * @property integer $city_id
+ * @property string $last_activity
  * @property string $password write-only password
  */
 class User extends ActiveRecord implements IdentityInterface
@@ -60,7 +62,7 @@ class User extends ActiveRecord implements IdentityInterface
     public function rules()
     {
         return [
-            ['status', 'default', 'value' => self::STATUS_INACTIVE],
+            ['status', 'default', 'value' => self::STATUS_ACTIVE],
             ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_INACTIVE, self::STATUS_DELETED]],
         ];
     }
