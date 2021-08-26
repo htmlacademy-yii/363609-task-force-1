@@ -5,8 +5,9 @@ use frontend\models\db\Tasks;
 use Yii;
 use frontend\models\form\TasksForm;
 use yii\web\NotFoundHttpException;
+use frontend\controllers\SecuredController;
 
-class TasksController extends \yii\web\Controller
+class TasksController extends SecuredController
 {
     public function actionIndex()
     {

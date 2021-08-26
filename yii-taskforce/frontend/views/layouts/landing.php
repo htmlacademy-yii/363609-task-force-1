@@ -7,6 +7,8 @@ use yii\helpers\Html;
 use frontend\assets\AppAsset;
 use yii\widgets\Menu;
 use yii\helpers\Url;
+use yii\widgets\ActiveForm;
+use yii\widgets\Pjax;
 
 AppAsset::register($this);
 ?>
@@ -21,15 +23,14 @@ AppAsset::register($this);
     <title><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
 </head>
-<body>
+<body class="landing">
 <?php $this->beginBody() ?>
-
 <div class="table-layout">
-    <header class="page-header">
-        <div class="main-container page-header__container">
-            <div class="page-header__logo">
-                <a href="<?=Url::to(['site/index'])?>">
-                    <svg class="page-header__logo-image" id="Layer_2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1634 646.35">
+    <header class=" page-header--index">
+        <div class="main-container page-header__container page-header__container--index">
+            <div class="page-header__logo--index">
+                <a>
+                    <svg class="logo-image--index" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1634 646.35">
                         <title>taskforce_logo2-01</title>
                         <g>
                             <g>
@@ -54,78 +55,20 @@ AppAsset::register($this);
                         </g>
                     </svg>
                 </a>
+                <p>Работа там, где ты!</p>
             </div>
-            <?php if(!Yii::$app->user->isGuest) {?>
-                <div class="header__nav">
-                    <?php
-                    echo Menu::widget([
-                        'items' => [
-                            ['label' => 'Задания', 'url' => ['/'], 'options' => ['class' => 'site-list__item']],
-                            ['label' => 'Исполнители', 'url' => ['/'], 'options' => ['class' => 'site-list__item']],
-                            ['label' => 'Создать задание', 'url' => ['/'], 'options' => ['class' => 'site-list__item']],
-                            ['label' => 'Мой профиль', 'url' => ['/'], 'options' => ['class' => 'site-list__item'], 'visible' => !Yii::$app->user->isGuest],
-                        ],
-                        'options' => [
-                            'class' => 'header-nav__list site-list',
-                        ],
-                    ]);
-                    ?>
-                </div>
-            <?php } ?>
-            <?php if(!Yii::$app->user->isGuest) {?>
-                <div class="header__town">
-                    <select class="multiple-select input town-select" size="1" name="town[]">
-                        <option value="Moscow">Москва</option>
-                        <option selected value="SPB">Санкт-Петербург</option>
-                        <option value="Krasnodar">Краснодар</option>
-                        <option value="Irkutsk">Иркутск</option>
-                        <option value="Vladivostok">Владивосток</option>
-                    </select>
-                </div>
-                <div class="header__lightbulb"></div>
-                <div class="lightbulb__pop-up">
-                    <h3>Новые события</h3>
-                    <p class="lightbulb__new-task lightbulb__new-task--message">
-                        Новое сообщение в чате
-                        <a href="#" class="link-regular">«Помочь с курсовой»</a>
-                    </p>
-                    <p class="lightbulb__new-task lightbulb__new-task--executor">
-                        Выбран исполнитель для
-                        <a href="#" class="link-regular">«Помочь с курсовой»</a>
-                    </p>
-                    <p class="lightbulb__new-task lightbulb__new-task--close">
-                        Завершено задание
-                        <a href="#" class="link-regular">«Помочь с курсовой»</a>
-                    </p>
-                </div>
-                <div class="header__account">
-                    <a class="header__account-photo">
-                        <img src="<?=Yii::$app->user->identity->photo?>"
-                             width="43" height="44"
-                             alt="<?=Yii::$app->user->identity->name?>">
-                    </a>
-                    <span class="header__account-name">
-                     <?=Yii::$app->user->identity->name?>
-                    </span>
-                </div>
-                <div class="account__pop-up">
-                    <ul class="account__pop-up-list">
-                        <li>
-                            <a href="#">Мои задания</a>
-                        </li>
-                        <li>
-                            <a href="#">Настройки</a>
-                        </li>
-                        <li>
-                            <a href="<?=Url::to(['site/logout'])?>">Выход</a>
-                        </li>
-                    </ul>
-                </div>
-            <?php } ?>
+            <div class="header__account--index">
+                <a href="#" class="header__account-enter open-modal" data-for="enter-form">
+                    <span>Вход</span></a>
+                или
+                <a href="<?=Url::to(['registration/index'])?>" class="header__account-registration">
+                    Регистрация
+                </a>
+            </div>
         </div>
     </header>
-    <main class="page-main">
-        <div class="main-container page-container">
+    <main>
+        <div class="landing-container">
             <?= $content ?>
         </div>
     </main>
@@ -164,7 +107,7 @@ AppAsset::register($this);
                 </ul>
             </div>
             <div class="page-footer__copyright">
-                <a>
+                <a href="https://htmlacademy.ru">
                     <img class="copyright-logo"
                          src="./img/academy-logo.png"
                          width="185" height="63"
@@ -173,59 +116,24 @@ AppAsset::register($this);
             </div>
         </div>
     </footer>
-    <section class="modal response-form form-modal" id="response-form">
-        <h2>Отклик на задание</h2>
-        <form action="#" method="post">
-            <p>
-                <label class="form-modal-description" for="response-payment">Ваша цена</label>
-                <input class="response-form-payment input input-middle input-money" type="text" name="response-payment" id="response-payment">
-            </p>
-            <p>
-                <label class="form-modal-description" for="response-comment">Комментарий</label>
-                <textarea class="input textarea" rows="4" id="response-comment" name="response-comment" placeholder="Place your text"></textarea>
-            </p>
-            <button class="button modal-button" type="submit">Отправить</button>
-        </form>
-        <button class="form-modal-close" type="button">Закрыть</button>
-    </section>
-    <section class="modal completion-form form-modal" id="complete-form">
-        <h2>Завершение задания</h2>
-        <p class="form-modal-description">Задание выполнено?</p>
-        <form action="#" method="post">
-            <input class="visually-hidden completion-input completion-input--yes" type="radio" id="completion-radio--yes" name="completion" value="yes">
-            <label class="completion-label completion-label--yes" for="completion-radio--yes">Да</label>
-            <input class="visually-hidden completion-input completion-input--difficult" type="radio" id="completion-radio--yet" name="completion" value="difficulties">
-            <label  class="completion-label completion-label--difficult" for="completion-radio--yet">Возникли проблемы</label>
-            <p>
-                <label class="form-modal-description" for="completion-comment">Комментарий</label>
-                <textarea class="input textarea" rows="4" id="completion-comment" name="completion-comment" placeholder="Place your text"></textarea>
-            </p>
-            <p class="form-modal-description">
-                Оценка
-            <div class="feedback-card__top--name completion-form-star">
-                <span class="star-disabled"></span>
-                <span class="star-disabled"></span>
-                <span class="star-disabled"></span>
-                <span class="star-disabled"></span>
-                <span class="star-disabled"></span>
-            </div>
-            </p>
-            <input type="hidden" name="rating" id="rating">
-            <button class="button modal-button" type="submit">Отправить</button>
-        </form>
-        <button class="form-modal-close" type="button">Закрыть</button>
-    </section>
-    <section class="modal form-modal refusal-form" id="refuse-form">
-        <h2>Отказ от задания</h2>
-        <p>
-            Вы собираетесь отказаться от выполнения задания.
-            Это действие приведёт к снижению вашего рейтинга.
-            Вы уверены?
-        </p>
-        <button class="button__form-modal button" id="close-modal"
-                type="button">Отмена</button>
-        <button class="button__form-modal refusal-button button"
-                type="button">Отказаться</button>
+    <section class="modal enter-form form-modal" id="enter-form">
+        <h2>Вход на сайт</h2>
+        <?php Pjax::begin(['id' => 'login']); ?>
+            <?php ActiveForm::begin([
+                'action' => ['site/login'],
+                'options' => ['data-pjax' => true]
+            ]); ?>
+                <p>
+                    <?=Html::activeLabel($this->params['modelLogin'], 'email', ['class' => 'form-modal-description'])?>
+                    <?=Html::activeTextInput($this->params['modelLogin'], 'email', ['class' => 'enter-form-email input input-middle', 'type' => 'email'])?>
+                </p>
+                <p>
+                    <?=Html::activeLabel($this->params['modelLogin'], 'password', ['class' => 'form-modal-description'])?>
+                    <?=Html::activePasswordInput($this->params['modelLogin'], 'password', ['class' => 'enter-form-email input input-middle'])?>
+                </p>
+                <?=Html::submitButton('Войти', ['class' => 'button'])?>
+            <?php ActiveForm::end()?>
+        <?php Pjax::end(); ?>
         <button class="form-modal-close" type="button">Закрыть</button>
     </section>
 </div>
@@ -234,3 +142,12 @@ AppAsset::register($this);
 </body>
 </html>
 <?php $this->endPage() ?>
+<?php
+$this->registerJs(
+    '$("document").ready(function(){
+            $("#login").on("pjax:end", function() {
+            $.pjax.reload({container:"#login"});  //Reload GridView
+        });
+    });'
+);
+?>
