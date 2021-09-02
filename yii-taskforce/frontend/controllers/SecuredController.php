@@ -19,15 +19,7 @@ class SecuredController extends Controller
                     [
                         'allow' => true,
                         'roles' => ['@']
-                    ],
-                    [
-                        'allow' => true,
-                        'actions' => ['index', 'login'],
-                        'roles' => ['?'],
-                        'matchCallback' => function ($rule, $action) {
-                            return Yii::$app->controller->id == 'site';
-                        }
-                    ],
+                    ]
                 ]
             ]
         ];

@@ -2,12 +2,12 @@
 namespace frontend\controllers;
 use Yii;
 use common\models\LoginForm;
-use frontend\controllers\SecuredController;
+use yii\web\Controller;
 
 /**
  * Site controller
  */
-class SiteController extends SecuredController
+class SiteController extends Controller
 {
     public $layout = 'landing';
 
