@@ -5,8 +5,9 @@ use common\models\User;
 use frontend\models\db\Tasks;
 use Yii;
 use frontend\models\form\UsersForm;
+use frontend\controllers\SecuredController;
 
-class UsersController extends \yii\web\Controller
+class UsersController extends SecuredController
 {
     public function actionIndex()
     {
