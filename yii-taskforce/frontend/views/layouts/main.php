@@ -62,7 +62,7 @@ AppAsset::register($this);
                         'items' => [
                             ['label' => 'Задания', 'url' => ['/'], 'options' => ['class' => 'site-list__item']],
                             ['label' => 'Исполнители', 'url' => ['/'], 'options' => ['class' => 'site-list__item']],
-                            ['label' => 'Создать задание', 'url' => ['/'], 'options' => ['class' => 'site-list__item']],
+                            ['label' => 'Создать задание', 'url' => ['tasks/create'], 'options' => ['class' => 'site-list__item']],
                             ['label' => 'Мой профиль', 'url' => ['/'], 'options' => ['class' => 'site-list__item'], 'visible' => !Yii::$app->user->isGuest],
                         ],
                         'options' => [

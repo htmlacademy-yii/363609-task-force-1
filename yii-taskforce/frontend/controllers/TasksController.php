@@ -4,11 +4,40 @@ namespace frontend\controllers;
 use frontend\models\db\Tasks;
 use Yii;
 use frontend\models\form\TasksForm;
+use yii\filters\AccessControl;
 use yii\web\NotFoundHttpException;
 use frontend\controllers\SecuredController;
 
 class TasksController extends SecuredController
 {
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::class,
+                'denyCallback' => function ($rule, $action) {
+                    $this->redirect(['site/index']);
+                },
+                'rules' => [
+                    [
+                        'actions' => ['create'],
+                        'allow' => true,
+                        'roles' => ['organizer'],
+                    ],
+                    [
+                        'actions' => ['index', 'view'],
+                        'allow' => true,
+                        'roles' => ['@']
+                    ],
+                ]
+            ]
+        ];
+
+    }
+
+    /**
+     * @return string
+     */
     public function actionIndex()
     {
         $get = Yii::$app->request->get();
@@ -23,6 +52,11 @@ class TasksController extends SecuredController
             ]);
     }
 
+    /**
+     * @param $id
+     * @return string
+     * @throws NotFoundHttpException
+     */
     public function actionView($id)
     {
         $model = Tasks::findOne($id);
@@ -43,6 +77,25 @@ class TasksController extends SecuredController
                 'replies' => $replies
             ]
         );
+    }
+
+    /**
+     * @return string
+     */
+    public function actionCreate()
+    {
+        $post = Yii::$app->request->post();
+        $model = new Tasks();
+
+        if($model->load($post) && $model->validate()) {
+            $model->executor_id = Yii::$app->user->identity->id;
+            if ($model->save())
+                $model->uploadFile($model);
+        }
+
+        return $this->render('create', [
+            'model' => $model,
+        ]);
     }
 
 }

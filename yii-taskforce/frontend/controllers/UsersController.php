@@ -9,6 +9,9 @@ use frontend\controllers\SecuredController;
 
 class UsersController extends SecuredController
 {
+    /**
+     * @return string
+     */
     public function actionIndex()
     {
         $get = Yii::$app->request->get();
@@ -23,6 +26,10 @@ class UsersController extends SecuredController
             ]);
     }
 
+    /**
+     * @param $id
+     * @return string
+     */
     public function actionView($id)
     {
         $model = User::findOne($id);
