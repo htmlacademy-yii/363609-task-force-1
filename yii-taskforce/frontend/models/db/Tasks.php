@@ -151,10 +151,10 @@ class Tasks extends \yii\db\ActiveRecord
         return Categories::find()->select(['id', 'name'])->all();
     }
 
-    public function uploadFile($model)
+    public function uploadFile()
     {
         if(FileHelper::createDirectory($_SERVER['DOCUMENT_ROOT'] . '/uploads')) {
-            $files = UploadedFile::getInstances($model, 'files');
+            $files = UploadedFile::getInstances($this, 'files');
             foreach ($files as $file) {
                 $save = $file->saveAs($_SERVER['DOCUMENT_ROOT'] . '/uploads/' . $file->baseName . '.' . $file->extension);
                 if($save) {

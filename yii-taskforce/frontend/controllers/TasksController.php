@@ -90,7 +90,7 @@ class TasksController extends SecuredController
         if($model->load($post) && $model->validate()) {
             $model->executor_id = Yii::$app->user->identity->id;
             if ($model->save())
-                $model->uploadFile($model);
+                $model->uploadFile();
 
             return $this->redirect(['tasks/index']);
         }
