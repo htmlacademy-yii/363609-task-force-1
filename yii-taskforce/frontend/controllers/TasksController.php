@@ -1,6 +1,7 @@
 <?php
 namespace frontend\controllers;
 
+use frontend\models\db\Replies;
 use frontend\models\db\Tasks;
 use Yii;
 use frontend\models\form\TasksForm;
@@ -25,7 +26,7 @@ class TasksController extends SecuredController
                         'roles' => ['organizer'],
                     ],
                     [
-                        'actions' => ['index', 'view'],
+                        'actions' => ['index', 'view', 'button'],
                         'allow' => true,
                         'roles' => ['@']
                     ],
@@ -68,7 +69,14 @@ class TasksController extends SecuredController
         $date = \DateTime::createFromFormat("Y-m-d", $model->customer->dt_add); // задаем дату в любом формате
         $interval = $now->diff($date); // получаем разницу в виде объекта DateInterval
 
-        $replies = $model->replies;
+        if($model->customer_id == Yii::$app->user->identity->id) {
+            $replies = $model->replies;
+        }
+        else {
+            $replies = Replies::find()
+                ->where(['user_id' => Yii::$app->user->identity->id, 'task_id' => $model->id])
+                ->all();
+        }
 
         return $this->render('view',
             [
@@ -88,7 +96,7 @@ class TasksController extends SecuredController
         $model = new Tasks();
 
         if($model->load($post) && $model->validate()) {
-            $model->executor_id = Yii::$app->user->identity->id;
+            $model->customer_id = Yii::$app->user->identity->id;
             if ($model->save())
                 $model->uploadFile();
 
@@ -98,6 +106,14 @@ class TasksController extends SecuredController
         return $this->render('create', [
             'model' => $model,
         ]);
+    }
+
+    public function actionButton($id)
+    {
+        if (Yii::$app->request->isPjax) {
+
+            return ' ';
+        }
     }
 
 }

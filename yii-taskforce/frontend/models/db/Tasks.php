@@ -10,6 +10,7 @@ use frontend\models\db\Replies;
 use frontend\models\db\TasksFiles;
 use yii\helpers\FileHelper;
 use yii\web\UploadedFile;
+use yii\behaviors\TimestampBehavior;
 
 /**
  * This is the model class for table "tasks".
@@ -49,6 +50,19 @@ class Tasks extends \yii\db\ActiveRecord
         self::STATUS_FAILED => 'Провалено',
     ];
 
+    public function behaviors()
+    {
+        return [
+            'timestamp' => [
+                'class' => TimestampBehavior::class,
+                'attributes' => [
+                    \yii\db\ActiveRecord::EVENT_BEFORE_INSERT => ['dt_add'],
+                ],
+                'value' => new \yii\db\Expression('CURRENT_DATE()'),
+            ],
+        ];
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -63,7 +77,7 @@ class Tasks extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['dt_add', 'expire'], 'date', 'format' => 'php:Y-m-d'],
+            [['expire'], 'date', 'format' => 'php:Y-m-d'],
             [['category_id', 'budget', 'status', 'city_id', 'executor_id', 'customer_id'], 'integer'],
             [['address'], 'string'],
             [['lat', 'long'], 'number'],
@@ -71,7 +85,9 @@ class Tasks extends \yii\db\ActiveRecord
             [['name', 'description', 'category_id'], 'required'],
             [['name'], 'string', 'min' => 10, 'max' => 255],
             [['description'], 'string', 'min' => 30],
-            [['category_id'], 'exist', 'skipOnError' => false, 'targetClass' => Categories::class, 'targetAttribute' => ['category_id' => 'id']]
+            [['category_id'], 'exist', 'skipOnError' => false, 'targetClass' => Categories::class, 'targetAttribute' => ['category_id' => 'id']],
+            [['customer_id'], 'exist', 'skipOnError' => false, 'targetClass' => User::class, 'targetAttribute' => ['customer_id' => 'id']],
+            [['executor_id'], 'exist', 'skipOnError' => false, 'targetClass' => User::class, 'targetAttribute' => ['executor_id' => 'id']]
         ];
     }
 

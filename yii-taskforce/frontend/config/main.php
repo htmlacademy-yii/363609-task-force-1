@@ -19,6 +19,9 @@ return [
             'identityClass' => 'common\models\User',
             'enableAutoLogin' => true,
             'identityCookie' => ['name' => '_identity-frontend', 'httpOnly' => true],
+            'on afterLogin' => function($event) {
+                Yii::$app->user->identity->updateAttributes(['last_activity' => new \yii\db\Expression('NOW()')]);
+            }
         ],
         'session' => [
             // this is the name of the session cookie used for login on the frontend
