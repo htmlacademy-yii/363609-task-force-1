@@ -108,9 +108,27 @@ class TasksController extends SecuredController
         ]);
     }
 
+    /**
+     * кнопки откликов на задание
+     * @param $id
+     * @return string|void
+     */
     public function actionButton($id)
     {
-        if (Yii::$app->request->isPjax) {
+        $get = Yii::$app->request->get();
+        if (Yii::$app->request->isPjax && !empty($get['id']) && isset($get['action'])) {
+            $model = Replies::findOne(['id' => $get['id']]);
+
+            if(isset($model)) {
+                if($get['action'] == 'apply') {
+                    $model->updateAttributes(['status' => Replies::STATUS_ACCEPT]);
+                    $task = Tasks::findOne(['id' => $get['task']]);
+                    $task->updateAttributes(['status' => Tasks::STATUS_IN_WORK, 'executor_id' => $model->user_id]);
+                }
+
+                if($get['action'] == 'reject')
+                    $model->updateAttributes(['status' => Replies::STATUS_REJECT]);
+            }
 
             return ' ';
         }

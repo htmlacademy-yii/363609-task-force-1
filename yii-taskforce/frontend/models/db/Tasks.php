@@ -11,6 +11,10 @@ use frontend\models\db\TasksFiles;
 use yii\helpers\FileHelper;
 use yii\web\UploadedFile;
 use yii\behaviors\TimestampBehavior;
+use frontend\models\helpers\DoneAction;
+use frontend\models\helpers\RefuseAction;
+use frontend\models\helpers\CancelAction;
+use frontend\models\helpers\RespondAction;
 
 /**
  * This is the model class for table "tasks".
@@ -36,18 +40,40 @@ class Tasks extends \yii\db\ActiveRecord
     /*
      * статусы задач
      */
-    const STATUS_NEW = 1;
-    const STATUS_CANCELED = 2;
-    const STATUS_IN_WORK = 3;
-    const STATUS_COMPLETED = 4;
-    const STATUS_FAILED = 5;
+    public const STATUS_NEW = 1;
+    public const STATUS_CANCELED = 2;
+    public const STATUS_IN_WORK = 3;
+    public const STATUS_COMPLETED = 4;
+    public const STATUS_FAILED = 5;
 
-    const STATUSES_LIST = [
+    public const STATUSES_LIST = [
         self::STATUS_NEW => 'Новое',
         self::STATUS_CANCELED => 'Отменено',
         self::STATUS_IN_WORK => 'В работе',
         self::STATUS_COMPLETED => 'Выполнено',
         self::STATUS_FAILED => 'Провалено',
+    ];
+
+    /*
+     * доступные действия с заданиями
+     */
+    public const ACTION_CANCEL = 'cancel';
+    public const ACTION_RESPOND = 'respond';
+    public const ACTION_DONE = 'done';
+    public const ACTION_REFUSE = 'refuse';
+
+    public const ACTIONS_LIST = [
+        self::ACTION_CANCEL => 'Отменить',
+        self::ACTION_RESPOND => 'Откликнуться',
+        self::ACTION_DONE => 'Выполнено',
+        self::ACTION_REFUSE => 'Отказаться',
+    ];
+
+    private const AVAILABLE_ACTIONS_MAP = [
+        CancelAction::class,
+        DoneAction::class,
+        RefuseAction::class,
+        RespondAction::class
     ];
 
     public function behaviors()
@@ -167,6 +193,9 @@ class Tasks extends \yii\db\ActiveRecord
         return Categories::find()->select(['id', 'name'])->all();
     }
 
+    /**
+     * @throws \yii\base\Exception
+     */
     public function uploadFile()
     {
         if(FileHelper::createDirectory($_SERVER['DOCUMENT_ROOT'] . '/uploads')) {
@@ -182,6 +211,70 @@ class Tasks extends \yii\db\ActiveRecord
                     $modelFileTask->save();
                 }
             }
+        }
+    }
+
+    /**
+     * @return int
+     */
+    public function getExecutorId(): int
+    {
+        return $this->executor_id;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getCustomerId(): ?int
+    {
+        return $this->customer_id;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAvailableActions() :array
+    {
+        $currentUser = Yii::$app->user->identity->id;
+
+        return array_filter(self::AVAILABLE_ACTIONS_MAP, function ($action) use ($currentUser){
+            return call_user_func([$action, 'checkPermission'], $this, $currentUser);
+        });
+    }
+
+    /**
+     * @param $action
+     * @return int|void|null
+     */
+    public function getNextStatus($action): ?int
+    {
+        switch (true) {
+
+            case $action === self::ACTION_CANCEL && $this->currentStatus === self::STATUS_NEW:
+
+                return self::STATUS_CANCELED;
+                break;
+
+            case self::ACTION_RESPOND:
+
+                if($this->currentStatus == self::STATUS_NEW) {
+                    $nextStatus = self::STATUS_IN_WORK;
+                }
+                break;
+
+            case $action === self::ACTION_DONE && $this->currentStatus == self::STATUS_IN_WORK:
+
+                return self::STATUS_COMPLETED;
+                break;
+
+            case $action === self::ACTION_REFUSE && $this->currentStatus == self::STATUS_IN_WORK:
+
+                return self::STATUS_FAILED;
+                break;
+
+            default:
+                return null;
+
         }
     }
 

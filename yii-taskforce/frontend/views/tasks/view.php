@@ -2,6 +2,8 @@
 use yii\helpers\Url;
 use yii\widgets\Pjax;
 use yii\helpers\Html;
+use frontend\models\db\Tasks;
+use frontend\models\db\Replies;
 
 /* @var $this \yii\web\View */
 /* @var $model */
@@ -81,12 +83,12 @@ $this->title = $model->name;
                             </p>
                             <span><?=$model->budget?> ₽</span>
                         </div>
-                        <?php if($model->customer_id == Yii::$app->user->identity->id): ?>
+                        <?php if($model->customer_id == Yii::$app->user->identity->id && ($model->status == Tasks::STATUS_NEW && $reply->status == Replies::STATUS_NEW)): ?>
                             <div class="feedback-card__actions">
                                 <?php Pjax::begin(['enablePushState' => false]); ?>
                                 <?= Html::a(
                                     'Подтвердить',
-                                    ['tasks/button', 'id' => $reply->id, 'action' => 'apply'],
+                                    ['tasks/button', 'id' => $reply->id, 'action' => 'apply', 'task' => $model->id],
                                     ['class' => 'button__small-color request-button button', 'type' => 'button']
                                 ) ?>
                                 <?= Html::a(
