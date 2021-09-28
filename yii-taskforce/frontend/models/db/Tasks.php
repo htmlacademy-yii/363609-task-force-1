@@ -108,6 +108,7 @@ class Tasks extends \yii\db\ActiveRecord
             [['address'], 'string'],
             [['lat', 'long'], 'number'],
             [['files'], 'safe'],
+            [['status'], 'default', 'value' => self::STATUS_NEW],
             [['name', 'description', 'category_id'], 'required'],
             [['name'], 'string', 'min' => 10, 'max' => 255],
             [['description'], 'string', 'min' => 30],
@@ -237,9 +238,15 @@ class Tasks extends \yii\db\ActiveRecord
     {
         $currentUser = Yii::$app->user->identity->id;
 
-        return array_filter(self::AVAILABLE_ACTIONS_MAP, function ($action) use ($currentUser){
+        $modelActions = array_filter(self::AVAILABLE_ACTIONS_MAP, function ($action) use ($currentUser){
             return call_user_func([$action, 'checkPermission'], $this, $currentUser);
         });
+
+        $actions = [];
+        foreach ($modelActions as $modelAction) {
+            $actions[] = $modelAction::getAction($this);
+        }
+        return $actions;
     }
 
     /**

@@ -6,11 +6,17 @@ use frontend\models\db\Tasks;
 use frontend\models\db\Replies;
 
 /* @var $this \yii\web\View */
-/* @var $model */
+/* @var Tasks $model */
+/* @var array $actions */
+/* @var Replies $modelReplies */
+/* @var \frontend\models\db\Opinions $modelOpinions */
 
 $this->title = $model->name;
+$this->params['modals_actions'] = true;
+$this->params['task_id'] = $model->id;
+$this->params['model_replies'] = $modelReplies;
+$this->params['model_opinions'] = $modelOpinions;
 ?>
-
 <section class="content-view">
     <div class="content-view__card">
         <div class="content-view__card-wrapper">
@@ -54,12 +60,22 @@ $this->title = $model->name;
             </div>
         </div>
         <div class="content-view__action-buttons">
-            <button class=" button button__big-color response-button open-modal"
-                    type="button" data-for="response-form">Откликнуться</button>
-            <button class="button button__big-color refusal-button open-modal"
-                    type="button" data-for="refuse-form">Отказаться</button>
-            <button class="button button__big-color request-button open-modal"
-                    type="button" data-for="complete-form">Завершить</button>
+            <?php if(Yii::$app->user->can('executor') && empty($replies) && in_array(Tasks::ACTION_RESPOND, $actions)) :?>
+                <button class=" button button__big-color response-button open-modal"
+                        type="button" data-for="response-form">Откликнуться</button>
+            <?php endif;?>
+            <?php if(in_array(Tasks::ACTION_REFUSE, $actions)) :?>
+                <button class="button button__big-color refusal-button open-modal"
+                        type="button" data-for="refuse-form">Отказаться</button>
+            <?php endif;?>
+            <?php if(in_array(Tasks::ACTION_CANCEL, $actions)) :?>
+                <button class="button button__big-color refusal-button open-modal"
+                        type="button" data-for="cancel-form">Отменить</button>
+            <?php endif;?>
+            <?php if(in_array(Tasks::ACTION_DONE, $actions)) :?>
+                <button class="button button__big-color request-button open-modal"
+                        type="button" data-for="complete-form">Завершить</button>
+            <?php endif;?>
         </div>
     </div>
     <?php if(!empty($replies)):?>
@@ -81,7 +97,7 @@ $this->title = $model->name;
                             <p>
                                 <?=$reply->description?>
                             </p>
-                            <span><?=$model->budget?> ₽</span>
+                            <span><?=$reply->price?> ₽</span>
                         </div>
                         <?php if($model->customer_id == Yii::$app->user->identity->id && ($model->status == Tasks::STATUS_NEW && $reply->status == Replies::STATUS_NEW)): ?>
                             <div class="feedback-card__actions">
@@ -124,3 +140,4 @@ $this->title = $model->name;
         <chat class="connect-desk__chat"></chat>
     </div>
 </section>
+

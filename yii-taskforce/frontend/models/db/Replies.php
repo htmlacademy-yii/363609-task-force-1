@@ -5,6 +5,7 @@ namespace frontend\models\db;
 use common\models\User;
 use Yii;
 use yii\behaviors\TimestampBehavior;
+use frontend\models\db\Tasks;
 
 /**
  * This is the model class for table "replies".
@@ -54,6 +55,10 @@ class Replies extends \yii\db\ActiveRecord
         return [
             [['rate', 'user_id', 'task_id', 'status', 'price'], 'integer'],
             [['description'], 'string'],
+            [['status'], 'default', 'value' => self::STATUS_NEW],
+            [['user_id'], 'exist', 'skipOnError' => false, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
+            [['task_id'], 'exist', 'skipOnError' => false, 'targetClass' => Tasks::class, 'targetAttribute' => ['task_id' => 'id']],
+            [['price'], 'integer', 'min' => 0]
         ];
     }
 
@@ -65,7 +70,8 @@ class Replies extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'rate' => 'Rate',
-            'description' => 'Description',
+            'description' => 'Комментарий',
+            'price' => 'Ваша цена'
         ];
     }
 

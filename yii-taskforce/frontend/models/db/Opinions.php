@@ -3,8 +3,8 @@
 namespace frontend\models\db;
 
 use common\models\User;
-use Yii;
 use frontend\models\db\Tasks;
+use Yii;
 
 /**
  * This is the model class for table "opinions".
@@ -33,6 +33,8 @@ class Opinions extends \yii\db\ActiveRecord
             [['dt_add'], 'safe'],
             [['rate', 'task_id', 'user_id'], 'integer'],
             [['description'], 'string'],
+            [['user_id'], 'exist', 'skipOnError' => false, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
+            [['task_id'], 'exist', 'skipOnError' => false, 'targetClass' => Tasks::class, 'targetAttribute' => ['task_id' => 'id']],
         ];
     }
 
@@ -45,7 +47,7 @@ class Opinions extends \yii\db\ActiveRecord
             'id' => 'ID',
             'dt_add' => 'Dt Add',
             'rate' => 'Rate',
-            'description' => 'Description',
+            'description' => 'Комментарий',
         ];
     }
 

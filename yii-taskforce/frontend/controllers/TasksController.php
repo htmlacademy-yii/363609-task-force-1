@@ -1,6 +1,7 @@
 <?php
 namespace frontend\controllers;
 
+use frontend\models\db\Opinions;
 use frontend\models\db\Replies;
 use frontend\models\db\Tasks;
 use Yii;
@@ -26,7 +27,7 @@ class TasksController extends SecuredController
                         'roles' => ['organizer'],
                     ],
                     [
-                        'actions' => ['index', 'view', 'button'],
+                        'actions' => ['index', 'view', 'button', 'respond', 'refuse', 'cancel', 'done'],
                         'allow' => true,
                         'roles' => ['@']
                     ],
@@ -78,11 +79,17 @@ class TasksController extends SecuredController
                 ->all();
         }
 
+        $modelReplies = new Replies();
+        $modelOpinions = new Opinions();
+
         return $this->render('view',
             [
                 'model' => $model,
                 'interval' => $interval,
-                'replies' => $replies
+                'replies' => $replies,
+                'actions' => $model->getAvailableActions(),
+                'modelReplies' => $modelReplies,
+                'modelOpinions' => $modelOpinions
             ]
         );
     }
@@ -100,7 +107,7 @@ class TasksController extends SecuredController
             if ($model->save())
                 $model->uploadFile();
 
-            return $this->redirect(['tasks/index']);
+            $this->redirect(['tasks/index']);
         }
 
         return $this->render('create', [
@@ -109,7 +116,8 @@ class TasksController extends SecuredController
     }
 
     /**
-     * кнопки откликов на задание
+     * кнопки действия с откликами на задание
+     *
      * @param $id
      * @return string|void
      */
@@ -124,14 +132,99 @@ class TasksController extends SecuredController
                     $model->updateAttributes(['status' => Replies::STATUS_ACCEPT]);
                     $task = Tasks::findOne(['id' => $get['task']]);
                     $task->updateAttributes(['status' => Tasks::STATUS_IN_WORK, 'executor_id' => $model->user_id]);
+                    $this->redirect(['tasks/view', 'id' => $task->id]);
                 }
 
-                if($get['action'] == 'reject')
+                if($get['action'] == 'reject') {
                     $model->updateAttributes(['status' => Replies::STATUS_REJECT]);
+                    return ' ';
+                }
+            }
+        }
+    }
+
+    /**
+     * Сохраняет отклик на задание
+     *
+     * @return \yii\web\Response
+     */
+    public function actionRespond()
+    {
+        $post = Yii::$app->request->post();
+        if(!empty($post)) {
+            $model = new Replies();
+            if($model->load($post) && $model->validate()) {
+                $model->user_id = Yii::$app->user->identity->id;
+                $model->save();
+            }
+        }
+
+        return $this->redirect(['tasks/view', 'id' => $post['Replies']['task_id']]);
+    }
+
+    /**
+     * Отказ от задания исполнителем
+     *
+     * @return \yii\web\Response
+     */
+    public function actionRefuse()
+    {
+        $post = Yii::$app->request->post();
+        if(!empty($post) && !empty($post['task_id'])) {
+            $model = Tasks::findOne(['id' => $post['task_id']]);
+            if(!empty($model) && $model->executor_id == Yii::$app->user->identity->id) {
+                $model->updateAttributes(['status' => Tasks::STATUS_FAILED]);
+            }
+        }
+
+        return $this->redirect(['tasks/view', 'id' => $post['task_id']]);
+    }
+
+    /**
+     * Отмена задания
+     *
+     * @return \yii\web\Response
+     */
+    public function actionCancel()
+    {
+        $post = Yii::$app->request->post();
+        if(!empty($post) && !empty($post['task_id'])) {
+            $model = Tasks::findOne(['id' => $post['task_id']]);
+            if(!empty($model) && $model->customer_id == Yii::$app->user->identity->id) {
+                $model->updateAttributes(['status' => Tasks::STATUS_CANCELED]);
+            }
+        }
+
+        return $this->redirect(['tasks/view', 'id' => $post['task_id']]);
+    }
+
+    /**
+     * Завершение задания и отзыв на исполнителя
+     *
+     * @return \yii\web\Response
+     */
+    public function actionDone()
+    {
+        $post = Yii::$app->request->post();
+        if(!empty($post)) {
+
+            $modelTask = Tasks::findOne(['id' => $post['Opinions']['task_id']]);
+            if($post['completion'] == 'y') {
+                $modelTask->updateAttributes(['status' => Tasks::STATUS_COMPLETED]);
+            }
+            elseif ($post['completion'] == 'n') {
+                $modelTask->updateAttributes(['status' => Tasks::STATUS_FAILED]);
             }
 
-            return ' ';
+            $model = new Opinions();
+            if($model->load($post) && $model->validate()) {
+                $model->user_id = Yii::$app->user->identity->id;
+                $model->save();
+
+            }
         }
+
+        return $this->redirect(['tasks/view', 'id' => $post['Opinions']['task_id']]);
     }
 
 }

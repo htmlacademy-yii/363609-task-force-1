@@ -8,5 +8,20 @@ use frontend\models\db\Tasks;
  */
 interface ActionInterface
 {
-    public static function checkPermission(Tasks $task, int $currentUserId);
+    /**
+     * Проверяет доступность действия для задания и юзера
+     *
+     * @param Tasks $task
+     * @param int $currentUserId
+     * @return bool
+     */
+    public static function checkPermission(Tasks $task, int $currentUserId):bool;
+
+    /**
+     * Возвращает название действия
+     *
+     * @param Tasks $task
+     * @return string
+     */
+    public static function getAction(Tasks $task):string;
 }
