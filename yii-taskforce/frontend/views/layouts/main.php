@@ -268,26 +268,22 @@ AppAsset::register($this);
         selector: "#autoComplete",
         placeHolder: "Поиск по адресу...",
         wrapper: false,
+        threshold: 3,
+        debounce: 1000,
         data: {
-            // src: async (query, a) => {
-            //     try {
-            //         // Fetch Data from external Source
-            //         const source = await fetch(`https://www.api.com/${query}`);
-            //         // Data is array of `Objects` | `Strings`
-            //         const data = await source.json();
-            //
-            //         return data;
-            //     } catch (error) {
-            //         return error;
-            //     }
-            // },
-            // // Data 'Object' key to be searched
-            // keys: ["address"],
-            src: [
-                { "address": "Sauce - Thousand Island" },
-                { "address": "Wild Boar - Tenderloin" },
-                { "address": "Goat - Whole Cut" }
-            ],
+            src: async (query, a) => {
+                try {
+                    // Fetch Data from external Source
+                    const source = await fetch(`<?=Url::to(['address-search/index'])?>/?action=address&q=${query}`);
+                    // Data is array of `Objects` | `Strings`
+                    const data = await source.json();
+
+                    return data;
+                } catch (error) {
+                    return error;
+                }
+            },
+            // Data 'Object' key to be searched
             keys: ["address"],
             cache: false,
         },
@@ -325,8 +321,7 @@ AppAsset::register($this);
             input: {
                 selection: (event) => {
                     const selection = event.detail.selection.value;
-                    autoCompleteJS.input.value = selection;
-                    console.log(selection.address);
+                    autoCompleteJS.input.value = selection.address;
                 }
             }
         }
