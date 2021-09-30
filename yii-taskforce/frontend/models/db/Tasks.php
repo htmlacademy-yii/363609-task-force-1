@@ -35,15 +35,18 @@ use yii\web\UploadedFile;
  */
 class Tasks extends ActiveRecord
 {
-    public const STATUS_NEW = 1;
+    public $files;
+    public $coordinate;
 
     /*
      * статусы задач
      */
+    public const STATUS_NEW = 1;
     public const STATUS_CANCELED = 2;
     public const STATUS_IN_WORK = 3;
     public const STATUS_COMPLETED = 4;
     public const STATUS_FAILED = 5;
+
     public const STATUSES_LIST = [
         self::STATUS_NEW => 'Новое',
         self::STATUS_CANCELED => 'Отменено',
@@ -59,27 +62,20 @@ class Tasks extends ActiveRecord
     public const ACTION_RESPOND = 'respond';
     public const ACTION_DONE = 'done';
     public const ACTION_REFUSE = 'refuse';
+
     public const ACTIONS_LIST = [
         self::ACTION_CANCEL => 'Отменить',
         self::ACTION_RESPOND => 'Откликнуться',
         self::ACTION_DONE => 'Выполнено',
         self::ACTION_REFUSE => 'Отказаться',
     ];
+
     private const AVAILABLE_ACTIONS_MAP = [
         CancelAction::class,
         DoneAction::class,
         RefuseAction::class,
         RespondAction::class
     ];
-    public $files;
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function tableName()
-    {
-        return 'tasks';
-    }
 
     public function behaviors()
     {
@@ -92,6 +88,14 @@ class Tasks extends ActiveRecord
                 'value' => new Expression('CURRENT_DATE()'),
             ],
         ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function tableName()
+    {
+        return 'tasks';
     }
 
     /**
