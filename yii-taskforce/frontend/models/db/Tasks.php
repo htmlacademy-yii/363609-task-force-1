@@ -36,6 +36,7 @@ use frontend\models\helpers\RespondAction;
 class Tasks extends \yii\db\ActiveRecord
 {
     public $files;
+    public $coordinate;
 
     /*
      * статусы задач
