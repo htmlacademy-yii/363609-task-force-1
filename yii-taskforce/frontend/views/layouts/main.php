@@ -21,6 +21,8 @@ AppAsset::register($this);
     <?php $this->registerCsrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
+    <script src="https://api-maps.yandex.ru/2.1/?apikey=e666f398-c983-4bde-8f14-e3fec900592a&lang=ru_RU" type="text/javascript">
+    </script>
 </head>
 <body>
 <?php $this->beginBody() ?>
@@ -262,72 +264,78 @@ AppAsset::register($this);
 </div>
 <div class="overlay"></div>
 <?php $this->endBody() ?>
-<script src="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@10.2.6/dist/autoComplete.min.js"></script>
-<script>
-    const autoCompleteJS = new autoComplete({
-        selector: "#autoComplete",
-        placeHolder: "Поиск по адресу...",
-        wrapper: false,
-        threshold: 3,
-        debounce: 1000,
-        data: {
-            src: async (query, a) => {
-                try {
-                    // Fetch Data from external Source
-                    const source = await fetch(`<?=Url::to(['address-search/index'])?>/?action=address&q=${query}`);
-                    // Data is array of `Objects` | `Strings`
-                    const data = await source.json();
+<?php if(!empty($this->params['life_address'])) :?>
+    <script src="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@10.2.6/dist/autoComplete.min.js"></script>
+    <script>
+        const autoCompleteJS = new autoComplete({
+            selector: "#autoComplete",
+            placeHolder: "Поиск по адресу...",
+            wrapper: false,
+            threshold: 3,
+            debounce: 1000,
+            data: {
+                src: async (query, a) => {
+                    try {
+                        // Fetch Data from external Source
+                        const source = await fetch(`<?=Url::to(['address-search/index'])?>/?action=address&q=${query}`);
+                        // Data is array of `Objects` | `Strings`
+                        const data = await source.json();
 
-                    return data;
-                } catch (error) {
-                    return error;
-                }
+                        return data;
+                    } catch (error) {
+                        return error;
+                    }
+                },
+                // Data 'Object' key to be searched
+                keys: ["address"],
+                cache: false,
             },
-            // Data 'Object' key to be searched
-            keys: ["address"],
-            cache: false,
-        },
-        resultsList: {
-            element: (list, data) => {
-                if (!data.results.length) {
-                    // Create "No Results" message element
-                    const message = document.createElement("div");
-                    // Add class to the created element
-                    message.setAttribute("class", "no_result");
-                    // Add message text content
-                    message.innerHTML = `<span>Found No Results for "${data.query}"</span>`;
-                    // Append message element to the results list
-                    list.prepend(message);
-                }
+            resultsList: {
+                element: (list, data) => {
+                    if (!data.results.length) {
+                        // Create "No Results" message element
+                        const message = document.createElement("div");
+                        // Add class to the created element
+                        message.setAttribute("class", "no_result");
+                        // Add message text content
+                        message.innerHTML = `<span>Found No Results for "${data.query}"</span>`;
+                        // Append message element to the results list
+                        list.prepend(message);
+                    }
+                },
+                tag: "ul",
+                id: "autoComplete_list",
+                class: "results_list",
+                destination: "#autoComplete",
+                position: "afterend",
+                maxResults: 5,
+                noResults: true,
             },
-            tag: "ul",
-            id: "autoComplete_list",
-            class: "results_list",
-            destination: "#autoComplete",
-            position: "afterend",
-            maxResults: 5,
-            noResults: true,
-        },
-        resultItem: {
-            tag: "li",
-            class: "autoComplete_result",
-            element: (item, data) => {
-                item.setAttribute("data-parent", "food-item");
+            resultItem: {
+                tag: "li",
+                class: "autoComplete_result",
+                element: (item, data) => {
+                    item.setAttribute("data-parent", "food-item");
+                },
+                highlight: "autoComplete_highlight",
+                selected: "autoComplete_selected"
             },
-            highlight: "autoComplete_highlight",
-            selected: "autoComplete_selected"
-        },
-        events: {
-            input: {
-                selection: (event) => {
-                    const selection = event.detail.selection.value;
-                    autoCompleteJS.input.value = selection.address;
+            events: {
+                input: {
+                    selection: (event) => {
+                        const selection = event.detail.selection.value;
+                        autoCompleteJS.input.value = selection.address;
+
+                        const coordinate = document.getElementById("coordinate");
+                        let ar = selection.address.split(';');
+                        coordinate.value = ar[1];
+                    }
                 }
             }
-        }
-    });
-</script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@10.2.6/dist/css/autoComplete.min.css">
+        });
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@10.2.6/dist/css/autoComplete.min.css">
+<?php endif;?>
 </body>
 </html>
 <?php $this->endPage() ?>
