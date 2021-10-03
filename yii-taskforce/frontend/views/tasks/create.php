@@ -7,6 +7,7 @@ use yii\helpers\ArrayHelper;
  * @var $model \frontend\models\db\Tasks
  */
 $this->title = 'Создание задания';
+$this->params['life_address'] = true;
 ?>
 <section class="create__task">
     <h1><?=$this->title?></h1>

@@ -104,6 +104,10 @@ class TasksController extends SecuredController
 
         if($model->load($post) && $model->validate()) {
             $model->customer_id = Yii::$app->user->identity->id;
+            $coordinate = explode(' ', trim($model->coordinate));
+            $model->lat = $coordinate[1] ?? null;
+            $model->long = $coordinate[0] ?? null;
+            $model->address = explode(';', $model->address)[0] ?? null;
             if ($model->save())
                 $model->uploadFile();
 

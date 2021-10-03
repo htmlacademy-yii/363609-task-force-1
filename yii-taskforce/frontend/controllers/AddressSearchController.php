@@ -29,14 +29,14 @@ class AddressSearchController extends \yii\web\Controller
                 ]);
 
                 if ($response->getStatusCode() !== 200) {
-
+                    return $this->asJson([['address' => '']]);
                 }
 
                 $content = $response->getBody()->getContents();
                 $response_data = Json::decode($content, true);
 
                 if ($error = ArrayHelper::getValue($response_data, 'error.info')) {
-
+                    return $this->asJson([['address' => '']]);
                 }
 
                 $address = $response_data['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['metaDataProperty']['GeocoderMetaData']['AddressDetails']['Country']['AddressLine'] . '; ' .
