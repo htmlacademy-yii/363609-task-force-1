@@ -106,7 +106,7 @@ class Tasks extends ActiveRecord
         return [
             [['expire'], 'date', 'format' => 'php:Y-m-d'],
             [['category_id', 'budget', 'status', 'city_id', 'executor_id', 'customer_id'], 'integer'],
-            [['address'], 'string'],
+            [['address', 'coordinate'], 'string'],
             [['lat', 'long'], 'number'],
             [['files'], 'safe'],
             [['status'], 'default', 'value' => self::STATUS_NEW],
@@ -219,7 +219,7 @@ class Tasks extends ActiveRecord
     /**
      * @return int
      */
-    public function getExecutorId(): int
+    public function getExecutorId(): ?int
     {
         return $this->executor_id;
     }
