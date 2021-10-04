@@ -1,14 +1,11 @@
 <?php
 namespace frontend\modules\api\controllers;
 
-use frontend\models\db\Messages;
+use frontend\models\db\Tasks;
 use yii\rest\ActiveController;
-use Yii;
-use yii\helpers\Json;
-use yii\filters\AccessControl;
+use yii\rest\Controller;
 
 class MessagesController extends ActiveController
 {
-    public $modelClass = Messages::class;
-
+    public $modelClass = Tasks::class;
 }
