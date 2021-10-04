@@ -11,6 +11,11 @@ return [
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'controllerNamespace' => 'frontend\controllers',
+    'modules' => [
+        'api' => [
+            'class' => 'frontend\modules\api\Module'
+        ]
+    ],
     'components' => [
         'request' => [
             'csrfParam' => '_csrf-frontend',
@@ -48,7 +53,11 @@ return [
                 'users' => 'users/index',
                 'user/view/<id:.+>' => 'users/view',
                 'registration' => 'registration/index',
-                'task/create' => 'tasks/create'
+                'task/create' => 'tasks/create',
+                [
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'api/messages'
+                ]
             ],
         ],
     ],
