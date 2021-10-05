@@ -137,7 +137,7 @@ $this->params['model_opinions'] = $modelOpinions;
         </div>
     </div>
     <div id="chat-container">
-        <chat class="connect-desk__chat" task="<?=$model->id?>"></chat>
+        <chat class="connect-desk__chat" task="<?=$model->id?>" user="<?=Yii::$app->user->identity->id?>"></chat>
     </div>
 </section>
 <script type="text/javascript">
