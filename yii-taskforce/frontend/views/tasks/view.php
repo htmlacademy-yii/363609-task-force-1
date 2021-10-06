@@ -136,9 +136,11 @@ $this->params['model_opinions'] = $modelOpinions;
             <a href="<?=Url::to(['users/view', 'id' => $model->customer->id])?>" class="link-regular">Смотреть профиль</a>
         </div>
     </div>
+    <?php if(!empty($model->executor_id) && (Yii::$app->user->identity->id == $model->executor_id || Yii::$app->user->identity->id == $model->customer_id)): ?>
     <div id="chat-container">
         <chat class="connect-desk__chat" task="<?=$model->id?>" user="<?=Yii::$app->user->identity->id?>"></chat>
     </div>
+    <?php endif; ?>
 </section>
 <script type="text/javascript">
     // Функция ymaps.ready() будет вызвана, когда

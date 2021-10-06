@@ -17,7 +17,8 @@ class m211005_133814_create_messages_table extends Migration
             'task_id' => $this->integer(),
             'user_id' => $this->integer(),
             'message' => $this->text(),
-            'timestamp' => $this->integer()
+            'published_at' => $this->dateTime(),
+            'is_mine' => $this->boolean()
         ]);
 
         $this->createIndex(
