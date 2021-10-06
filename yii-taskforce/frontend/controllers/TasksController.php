@@ -67,7 +67,7 @@ class TasksController extends SecuredController
         }
 
         $now = new \DateTime(); // текущее время на сервере
-        $date = \DateTime::createFromFormat("Y-m-d", $model->customer->dt_add); // задаем дату в любом формате
+        $date = \DateTime::createFromFormat("Y-m-d", $model->customer->dt_add??date('Y-m-d')); // задаем дату в любом формате
         $interval = $now->diff($date); // получаем разницу в виде объекта DateInterval
 
         if($model->customer_id == Yii::$app->user->identity->id) {
