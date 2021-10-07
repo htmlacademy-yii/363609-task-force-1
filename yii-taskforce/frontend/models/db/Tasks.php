@@ -244,7 +244,7 @@ class Tasks extends \yii\db\ActiveRecord
 
         $actions = [];
         foreach ($modelActions as $modelAction) {
-            $actions[] = $modelAction::getAction($this);
+            $actions[] = $modelAction::getAction();
         }
         return $actions;
     }

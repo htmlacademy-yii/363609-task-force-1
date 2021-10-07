@@ -20,8 +20,7 @@ interface ActionInterface
     /**
      * Возвращает название действия
      *
-     * @param Tasks $task
      * @return string
      */
-    public static function getAction(Tasks $task):string;
+    public static function getAction():string;
 }

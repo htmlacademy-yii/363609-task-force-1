@@ -24,4 +24,10 @@ class SecuredController extends Controller
             ]
         ];
     }
+
+    public function beforeAction($action)
+    {
+        Yii::$app->user->identity->updateAttributes(['last_activity' => new \yii\db\Expression('NOW()')]);
+        return parent::beforeAction($action);
+    }
 }

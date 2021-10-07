@@ -17,11 +17,10 @@ class RespondAction implements ActionInterface
     }
 
     /**
-     * @param \frontend\models\db\Tasks $task
      * @return string
      */
-    public static function getAction(Tasks $task): string
+    public static function getAction(): string
     {
-        return $task::ACTION_RESPOND;
+        return Tasks::ACTION_RESPOND;
     }
 }

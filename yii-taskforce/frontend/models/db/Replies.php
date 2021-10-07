@@ -20,9 +20,9 @@ class Replies extends \yii\db\ActiveRecord
     /**
      * константы статусов откликов
      */
-    public const STATUS_NEW = 0;
-    public const STATUS_ACCEPT = 1;
-    public const STATUS_REJECT = 2;
+    public const STATUS_NEW = 1;
+    public const STATUS_ACCEPT = 2;
+    public const STATUS_REJECT = 3;
 
     /**
      * @return array[]

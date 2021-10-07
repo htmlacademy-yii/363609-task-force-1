@@ -17,11 +17,10 @@ class RefuseAction implements ActionInterface
     }
 
     /**
-     * @param \frontend\models\db\Tasks $task
      * @return string
      */
-    public static function getAction(Tasks $task): string
+    public static function getAction(): string
     {
-        return $task::ACTION_REFUSE;
+        return Tasks::ACTION_REFUSE;
     }
 }
