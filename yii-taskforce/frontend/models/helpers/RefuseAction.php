@@ -1,13 +1,14 @@
 <?php
+
 namespace frontend\models\helpers;
 
+use frontend\models\db\Tasks;
 use frontend\models\interface\ActionInterface;
-use \frontend\models\db\Tasks;
 
 class RefuseAction implements ActionInterface
 {
     /**
-     * @param \frontend\models\db\Tasks $task
+     * @param Tasks $task
      * @param int $currentUserId
      * @return bool
      */

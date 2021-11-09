@@ -1,11 +1,12 @@
 <?php
+
 namespace frontend\controllers;
 
 use common\models\User;
+use DateTime;
 use frontend\models\db\Tasks;
-use Yii;
 use frontend\models\form\UsersForm;
-use frontend\controllers\SecuredController;
+use Yii;
 
 class UsersController extends SecuredController
 {
@@ -21,7 +22,7 @@ class UsersController extends SecuredController
         return $this->render('index',
             [
                 'model' => $model,
-                'get' => $get['UsersForm']??'',
+                'get' => $get['UsersForm'] ?? '',
                 'dataProvider' => $model->getDataProvider()
             ]);
     }
@@ -33,14 +34,14 @@ class UsersController extends SecuredController
     public function actionView($id)
     {
         $model = User::findOne($id);
-        if(empty($model)) {
+        if (empty($model)) {
             throw new NotFoundHttpException('Пользователь не найдено');
         }
 
         $completedTasks = Tasks::find()->where(['status' => Tasks::STATUS_COMPLETED, 'executor_id' => $model->id])->count();
 
-        $now = new \DateTime(); // текущее время на сервере
-        $date = \DateTime::createFromFormat("Y-m-d", $model->profile->bd); // задаем дату в любом формате
+        $now = new DateTime(); // текущее время на сервере
+        $date = DateTime::createFromFormat("Y-m-d", $model->profile->bd); // задаем дату в любом формате
         $interval = $now->diff($date); // получаем разницу в виде объекта DateInterval
 
         return $this->render('view',

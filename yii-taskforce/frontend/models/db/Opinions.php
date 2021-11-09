@@ -3,8 +3,7 @@
 namespace frontend\models\db;
 
 use common\models\User;
-use frontend\models\db\Tasks;
-use Yii;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "opinions".
@@ -14,7 +13,7 @@ use Yii;
  * @property int|null $rate
  * @property string|null $description
  */
-class Opinions extends \yii\db\ActiveRecord
+class Opinions extends ActiveRecord
 {
     /**
      * {@inheritdoc}

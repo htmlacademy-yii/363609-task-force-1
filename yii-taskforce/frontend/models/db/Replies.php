@@ -3,9 +3,9 @@
 namespace frontend\models\db;
 
 use common\models\User;
-use Yii;
 use yii\behaviors\TimestampBehavior;
-use frontend\models\db\Tasks;
+use yii\db\ActiveRecord;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "replies".
@@ -15,7 +15,7 @@ use frontend\models\db\Tasks;
  * @property int|null $rate
  * @property string|null $description
  */
-class Replies extends \yii\db\ActiveRecord
+class Replies extends ActiveRecord
 {
     /**
      * константы статусов откликов
@@ -23,6 +23,14 @@ class Replies extends \yii\db\ActiveRecord
     public const STATUS_NEW = 1;
     public const STATUS_ACCEPT = 2;
     public const STATUS_REJECT = 3;
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function tableName()
+    {
+        return 'replies';
+    }
 
     /**
      * @return array[]
@@ -33,18 +41,11 @@ class Replies extends \yii\db\ActiveRecord
             'timestamp' => [
                 'class' => TimestampBehavior::class,
                 'attributes' => [
-                    \yii\db\ActiveRecord::EVENT_BEFORE_INSERT => ['dt_add'],
+                    ActiveRecord::EVENT_BEFORE_INSERT => ['dt_add'],
                 ],
-                'value' => new \yii\db\Expression('CURRENT_DATE()'),
+                'value' => new Expression('CURRENT_DATE()'),
             ],
         ];
-    }
-    /**
-     * {@inheritdoc}
-     */
-    public static function tableName()
-    {
-        return 'replies';
     }
 
     /**

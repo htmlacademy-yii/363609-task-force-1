@@ -2,7 +2,7 @@
 
 namespace frontend\models\db;
 
-use Yii;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "categories".
@@ -11,7 +11,7 @@ use Yii;
  * @property string|null $name
  * @property string|null $icon
  */
-class Categories extends \yii\db\ActiveRecord
+class Categories extends ActiveRecord
 {
     /**
      * {@inheritdoc}

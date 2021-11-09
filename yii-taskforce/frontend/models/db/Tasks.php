@@ -3,18 +3,18 @@
 namespace frontend\models\db;
 
 use common\models\User;
-use Yii;
-use frontend\models\db\Categories;
-use frontend\models\db\Cities;
-use frontend\models\db\Replies;
-use frontend\models\db\TasksFiles;
-use yii\helpers\FileHelper;
-use yii\web\UploadedFile;
-use yii\behaviors\TimestampBehavior;
+use frontend\models\helpers\CancelAction;
 use frontend\models\helpers\DoneAction;
 use frontend\models\helpers\RefuseAction;
-use frontend\models\helpers\CancelAction;
 use frontend\models\helpers\RespondAction;
+use Yii;
+use yii\base\Exception;
+use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
+use yii\db\Expression;
+use yii\helpers\FileHelper;
+use yii\web\UploadedFile;
 
 /**
  * This is the model class for table "tasks".
@@ -33,19 +33,17 @@ use frontend\models\helpers\RespondAction;
  * @property float|null $lat
  * @property float|null $long
  */
-class Tasks extends \yii\db\ActiveRecord
+class Tasks extends ActiveRecord
 {
-    public $files;
+    public const STATUS_NEW = 1;
 
     /*
      * статусы задач
      */
-    public const STATUS_NEW = 1;
     public const STATUS_CANCELED = 2;
     public const STATUS_IN_WORK = 3;
     public const STATUS_COMPLETED = 4;
     public const STATUS_FAILED = 5;
-
     public const STATUSES_LIST = [
         self::STATUS_NEW => 'Новое',
         self::STATUS_CANCELED => 'Отменено',
@@ -61,33 +59,19 @@ class Tasks extends \yii\db\ActiveRecord
     public const ACTION_RESPOND = 'respond';
     public const ACTION_DONE = 'done';
     public const ACTION_REFUSE = 'refuse';
-
     public const ACTIONS_LIST = [
         self::ACTION_CANCEL => 'Отменить',
         self::ACTION_RESPOND => 'Откликнуться',
         self::ACTION_DONE => 'Выполнено',
         self::ACTION_REFUSE => 'Отказаться',
     ];
-
     private const AVAILABLE_ACTIONS_MAP = [
         CancelAction::class,
         DoneAction::class,
         RefuseAction::class,
         RespondAction::class
     ];
-
-    public function behaviors()
-    {
-        return [
-            'timestamp' => [
-                'class' => TimestampBehavior::class,
-                'attributes' => [
-                    \yii\db\ActiveRecord::EVENT_BEFORE_INSERT => ['dt_add'],
-                ],
-                'value' => new \yii\db\Expression('CURRENT_DATE()'),
-            ],
-        ];
-    }
+    public $files;
 
     /**
      * {@inheritdoc}
@@ -95,6 +79,19 @@ class Tasks extends \yii\db\ActiveRecord
     public static function tableName()
     {
         return 'tasks';
+    }
+
+    public function behaviors()
+    {
+        return [
+            'timestamp' => [
+                'class' => TimestampBehavior::class,
+                'attributes' => [
+                    ActiveRecord::EVENT_BEFORE_INSERT => ['dt_add'],
+                ],
+                'value' => new Expression('CURRENT_DATE()'),
+            ],
+        ];
     }
 
     /**
@@ -139,7 +136,7 @@ class Tasks extends \yii\db\ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getCategories()
     {
@@ -147,7 +144,7 @@ class Tasks extends \yii\db\ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getCity()
     {
@@ -155,7 +152,7 @@ class Tasks extends \yii\db\ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getReplies()
     {
@@ -163,7 +160,7 @@ class Tasks extends \yii\db\ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getCustomer()
     {
@@ -171,7 +168,7 @@ class Tasks extends \yii\db\ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getFiles()
     {
@@ -179,7 +176,7 @@ class Tasks extends \yii\db\ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getUser()
     {
@@ -187,7 +184,7 @@ class Tasks extends \yii\db\ActiveRecord
     }
 
     /**
-     * @return array|Categories[]|\yii\db\ActiveRecord[]
+     * @return array|Categories[]|ActiveRecord[]
      */
     public function getAllCategories()
     {
@@ -195,15 +192,15 @@ class Tasks extends \yii\db\ActiveRecord
     }
 
     /**
-     * @throws \yii\base\Exception
+     * @throws Exception
      */
     public function uploadFile()
     {
-        if(FileHelper::createDirectory($_SERVER['DOCUMENT_ROOT'] . '/uploads')) {
+        if (FileHelper::createDirectory($_SERVER['DOCUMENT_ROOT'] . '/uploads')) {
             $files = UploadedFile::getInstances($this, 'files');
             foreach ($files as $file) {
                 $save = $file->saveAs($_SERVER['DOCUMENT_ROOT'] . '/uploads/' . $file->baseName . '.' . $file->extension);
-                if($save) {
+                if ($save) {
                     $modelFileTask = new TasksFiles();
                     $modelFileTask->id_task = $this->id;
                     $modelFileTask->name = $file->baseName;
@@ -234,11 +231,11 @@ class Tasks extends \yii\db\ActiveRecord
     /**
      * @return array
      */
-    public function getAvailableActions() :array
+    public function getAvailableActions(): array
     {
         $currentUser = Yii::$app->user->identity->id;
 
-        $modelActions = array_filter(self::AVAILABLE_ACTIONS_MAP, function ($action) use ($currentUser){
+        $modelActions = array_filter(self::AVAILABLE_ACTIONS_MAP, function ($action) use ($currentUser) {
             return call_user_func([$action, 'checkPermission'], $this, $currentUser);
         });
 
@@ -260,24 +257,18 @@ class Tasks extends \yii\db\ActiveRecord
             case $action === self::ACTION_CANCEL && $this->currentStatus === self::STATUS_NEW:
 
                 return self::STATUS_CANCELED;
-                break;
 
-            case self::ACTION_RESPOND:
+            case $action == self::ACTION_RESPOND && $this->currentStatus == self::STATUS_NEW:
 
-                if($this->currentStatus == self::STATUS_NEW) {
-                    $nextStatus = self::STATUS_IN_WORK;
-                }
-                break;
+                return self::STATUS_IN_WORK;
 
             case $action === self::ACTION_DONE && $this->currentStatus == self::STATUS_IN_WORK:
 
                 return self::STATUS_COMPLETED;
-                break;
 
             case $action === self::ACTION_REFUSE && $this->currentStatus == self::STATUS_IN_WORK:
 
                 return self::STATUS_FAILED;
-                break;
 
             default:
                 return null;

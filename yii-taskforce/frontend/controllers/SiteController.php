@@ -1,7 +1,9 @@
 <?php
+
 namespace frontend\controllers;
-use Yii;
+
 use common\models\LoginForm;
+use Yii;
 use yii\web\Controller;
 
 /**

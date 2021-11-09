@@ -1,4 +1,5 @@
 <?php
+
 namespace frontend\models\interface;
 
 use frontend\models\db\Tasks;
@@ -15,12 +16,12 @@ interface ActionInterface
      * @param int $currentUserId
      * @return bool
      */
-    public static function checkPermission(Tasks $task, int $currentUserId):bool;
+    public static function checkPermission(Tasks $task, int $currentUserId): bool;
 
     /**
      * Возвращает название действия
      *
      * @return string
      */
-    public static function getAction():string;
+    public static function getAction(): string;
 }
