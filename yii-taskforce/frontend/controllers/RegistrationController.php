@@ -1,13 +1,16 @@
 <?php
+
 namespace frontend\controllers;
 
 use frontend\models\form\RegistrationForm;
 use Yii;
+use yii\web\Controller;
+use yii\web\Response;
 
-class RegistrationController extends \yii\web\Controller
+class RegistrationController extends Controller
 {
     /**
-     * @return string|\yii\web\Response
+     * @return string|Response
      */
     public function actionIndex()
     {
@@ -17,7 +20,7 @@ class RegistrationController extends \yii\web\Controller
         if ($model->load(Yii::$app->request->post())) {
             if ($model->validate()) {
                 $user = $model->register();
-                if(!$user->hasErrors()) {
+                if (!$user->hasErrors()) {
                     Yii::$app->user->login($user);
                     return $this->redirect(['site/index']);
                 }

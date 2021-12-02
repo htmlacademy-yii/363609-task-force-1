@@ -2,8 +2,8 @@
 
 namespace frontend\models\db;
 
-use Yii;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "tasks_files".
@@ -16,21 +16,22 @@ use yii\behaviors\TimestampBehavior;
  * @property int|null $created_at
  * @property int|null $updated_at
  */
-class TasksFiles extends \yii\db\ActiveRecord
+class TasksFiles extends ActiveRecord
 {
 
-    public function behaviors()
-    {
-        return [
-            'timestamp' => TimestampBehavior::class
-        ];
-    }
     /**
      * {@inheritdoc}
      */
     public static function tableName()
     {
         return 'tasks_files';
+    }
+
+    public function behaviors()
+    {
+        return [
+            'timestamp' => TimestampBehavior::class
+        ];
     }
 
     /**

@@ -1,12 +1,22 @@
 <?php
 use yii\helpers\Url;
+use yii\widgets\Pjax;
+use yii\helpers\Html;
+use frontend\models\db\Tasks;
+use frontend\models\db\Replies;
 
 /* @var $this \yii\web\View */
-/* @var $model */
+/* @var Tasks $model */
+/* @var array $actions */
+/* @var Replies $modelReplies */
+/* @var \frontend\models\db\Opinions $modelOpinions */
 
 $this->title = $model->name;
+$this->params['modals_actions'] = true;
+$this->params['task_id'] = $model->id;
+$this->params['model_replies'] = $modelReplies;
+$this->params['model_opinions'] = $modelOpinions;
 ?>
-
 <section class="content-view">
     <div class="content-view__card">
         <div class="content-view__card-wrapper">
@@ -26,12 +36,14 @@ $this->title = $model->name;
                     <?=$model->description?>
                 </p>
             </div>
-            <div class="content-view__attach">
-                <h3 class="content-view__h3">Вложения</h3>
-                <?php foreach ($model->files as $file) :?>
-                    <a href="<?=$file->path?>" download><?=$file->name?></a>
-                <?php endforeach; ?>
-            </div>
+            <?php if($model->files) :?>
+                <div class="content-view__attach">
+                    <h3 class="content-view__h3">Вложения</h3>
+                    <?php foreach ($model->files as $file) :?>
+                        <a href="<?=$file->path?>" download><?=$file->name?></a>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif;?>
             <div class="content-view__location">
                 <h3 class="content-view__h3">Расположение</h3>
                 <div class="content-view__location-wrapper">
@@ -48,44 +60,66 @@ $this->title = $model->name;
             </div>
         </div>
         <div class="content-view__action-buttons">
-            <button class=" button button__big-color response-button open-modal"
-                    type="button" data-for="response-form">Откликнуться</button>
-            <button class="button button__big-color refusal-button open-modal"
-                    type="button" data-for="refuse-form">Отказаться</button>
-            <button class="button button__big-color request-button open-modal"
-                    type="button" data-for="complete-form">Завершить</button>
+            <?php if(Yii::$app->user->can('executor') && empty($replies) && in_array(Tasks::ACTION_RESPOND, $actions)) :?>
+                <button class=" button button__big-color response-button open-modal"
+                        type="button" data-for="response-form">Откликнуться</button>
+            <?php endif;?>
+            <?php if(in_array(Tasks::ACTION_REFUSE, $actions)) :?>
+                <button class="button button__big-color refusal-button open-modal"
+                        type="button" data-for="refuse-form">Отказаться</button>
+            <?php endif;?>
+            <?php if(in_array(Tasks::ACTION_CANCEL, $actions)) :?>
+                <button class="button button__big-color refusal-button open-modal"
+                        type="button" data-for="cancel-form">Отменить</button>
+            <?php endif;?>
+            <?php if(in_array(Tasks::ACTION_DONE, $actions)) :?>
+                <button class="button button__big-color request-button open-modal"
+                        type="button" data-for="complete-form">Завершить</button>
+            <?php endif;?>
         </div>
     </div>
-    <div class="content-view__feedback">
-        <h2>Отклики <span>(<?=count($replies)?>)</span></h2>
-        <div class="content-view__feedback-wrapper">
-            <?php foreach ($replies as $reply) :?>
-                <div class="content-view__feedback-card">
-                    <div class="feedback-card__top">
-                        <a href="<?=Url::to(['users/view', 'id' => $reply->user->id])?>"><img src="<?=$reply->user->photo?>" width="55" height="55"></a>
-                        <div class="feedback-card__top--name">
-                            <p><a href="<?=Url::to(['users/view', 'id' => $reply->user->id])?>" class="link-regular"><?=$reply->user->name?></a></p>
-                            <span></span><span></span><span></span><span></span><span class="star-disabled"></span>
-                            <b><?=round($reply->user->opinionsRating, 2)?></b>
+    <?php if(!empty($replies)):?>
+        <div class="content-view__feedback">
+            <h2>Отклики <span>(<?=count($replies)?>)</span></h2>
+            <div class="content-view__feedback-wrapper">
+                <?php foreach ($replies as $reply) :?>
+                    <div class="content-view__feedback-card">
+                        <div class="feedback-card__top">
+                            <a href="<?=Url::to(['users/view', 'id' => $reply->user->id])?>"><img src="<?=$reply->user->photo?>" width="55" height="55"></a>
+                            <div class="feedback-card__top--name">
+                                <p><a href="<?=Url::to(['users/view', 'id' => $reply->user->id])?>" class="link-regular"><?=$reply->user->name?></a></p>
+                                <span></span><span></span><span></span><span></span><span class="star-disabled"></span>
+                                <b><?=round($reply->user->opinionsRating, 2)?></b>
+                            </div>
+                            <span class="new-task__time"><?=Yii::$app->formatter->asDatetime($reply->user->last_activity, 'php:d.m.Y H:i:s')?></span>
                         </div>
-                        <span class="new-task__time">25 минут назад</span>
+                        <div class="feedback-card__content">
+                            <p>
+                                <?=$reply->description?>
+                            </p>
+                            <span><?=$reply->price?> ₽</span>
+                        </div>
+                        <?php if($model->customer_id == Yii::$app->user->identity->id && ($model->status == Tasks::STATUS_NEW && $reply->status == Replies::STATUS_NEW)): ?>
+                            <div class="feedback-card__actions">
+                                <?php Pjax::begin(['enablePushState' => false]); ?>
+                                <?= Html::a(
+                                    'Подтвердить',
+                                    ['tasks/button', 'id' => $reply->id, 'action' => 'apply', 'task' => $model->id],
+                                    ['class' => 'button__small-color request-button button', 'type' => 'button']
+                                ) ?>
+                                <?= Html::a(
+                                    'Отказать',
+                                    ['tasks/button', 'id' => $reply->id, 'action' => 'reject'],
+                                    ['class' => 'button__small-color refusal-button button', 'type' => 'button']
+                                ) ?>
+                                <?php Pjax::end(); ?>
+                            </div>
+                            <?php endif;?>
                     </div>
-                    <div class="feedback-card__content">
-                        <p>
-                            <?=$reply->description?>
-                        </p>
-                        <span><?=$model->budget?> ₽</span>
-                    </div>
-                    <div class="feedback-card__actions">
-                        <a class="button__small-color request-button button"
-                           type="button">Подтвердить</a>
-                        <a class="button__small-color refusal-button button"
-                           type="button">Отказать</a>
-                    </div>
-                </div>
-            <?php endforeach; ?>
+                <?php endforeach; ?>
+            </div>
         </div>
-    </div>
+    <?php endif;?>
 </section>
 <section class="connect-desk">
     <div class="connect-desk__profile-mini">
@@ -106,3 +140,4 @@ $this->title = $model->name;
         <chat class="connect-desk__chat"></chat>
     </div>
 </section>
+

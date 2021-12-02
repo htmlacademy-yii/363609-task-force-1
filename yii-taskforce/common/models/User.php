@@ -52,7 +52,13 @@ class User extends ActiveRecord implements IdentityInterface
     public function behaviors()
     {
         return [
-            TimestampBehavior::className(),
+            'timestamp' => [
+                'class' => TimestampBehavior::class,
+                'attributes' => [
+                    \yii\db\ActiveRecord::EVENT_BEFORE_INSERT => ['dt_add'],
+                ],
+                'value' => new \yii\db\Expression('CURRENT_DATE()'),
+            ],
         ];
     }
 

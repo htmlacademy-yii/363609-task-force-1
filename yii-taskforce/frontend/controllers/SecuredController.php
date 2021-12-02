@@ -1,9 +1,11 @@
 <?php
+
 namespace frontend\controllers;
 
 use Yii;
-use yii\web\Controller;
+use yii\db\Expression;
 use yii\filters\AccessControl;
+use yii\web\Controller;
 
 class SecuredController extends Controller
 {
@@ -23,5 +25,11 @@ class SecuredController extends Controller
                 ]
             ]
         ];
+    }
+
+    public function beforeAction($action)
+    {
+        Yii::$app->user->identity->updateAttributes(['last_activity' => new Expression('NOW()')]);
+        return parent::beforeAction($action);
     }
 }

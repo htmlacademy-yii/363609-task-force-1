@@ -3,11 +3,16 @@
 namespace frontend\models\db;
 
 use common\models\User;
+use frontend\models\helpers\CancelAction;
+use frontend\models\helpers\DoneAction;
+use frontend\models\helpers\RefuseAction;
+use frontend\models\helpers\RespondAction;
 use Yii;
-use frontend\models\db\Categories;
-use frontend\models\db\Cities;
-use frontend\models\db\Replies;
-use frontend\models\db\TasksFiles;
+use yii\base\Exception;
+use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
+use yii\db\Expression;
 use yii\helpers\FileHelper;
 use yii\web\UploadedFile;
 
@@ -28,26 +33,45 @@ use yii\web\UploadedFile;
  * @property float|null $lat
  * @property float|null $long
  */
-class Tasks extends \yii\db\ActiveRecord
+class Tasks extends ActiveRecord
 {
-    public $files;
+    public const STATUS_NEW = 1;
 
     /*
      * статусы задач
      */
-    const STATUS_NEW = 1;
-    const STATUS_CANCELED = 2;
-    const STATUS_IN_WORK = 3;
-    const STATUS_COMPLETED = 4;
-    const STATUS_FAILED = 5;
-
-    const STATUSES_LIST = [
+    public const STATUS_CANCELED = 2;
+    public const STATUS_IN_WORK = 3;
+    public const STATUS_COMPLETED = 4;
+    public const STATUS_FAILED = 5;
+    public const STATUSES_LIST = [
         self::STATUS_NEW => 'Новое',
         self::STATUS_CANCELED => 'Отменено',
         self::STATUS_IN_WORK => 'В работе',
         self::STATUS_COMPLETED => 'Выполнено',
         self::STATUS_FAILED => 'Провалено',
     ];
+
+    /*
+     * доступные действия с заданиями
+     */
+    public const ACTION_CANCEL = 'cancel';
+    public const ACTION_RESPOND = 'respond';
+    public const ACTION_DONE = 'done';
+    public const ACTION_REFUSE = 'refuse';
+    public const ACTIONS_LIST = [
+        self::ACTION_CANCEL => 'Отменить',
+        self::ACTION_RESPOND => 'Откликнуться',
+        self::ACTION_DONE => 'Выполнено',
+        self::ACTION_REFUSE => 'Отказаться',
+    ];
+    private const AVAILABLE_ACTIONS_MAP = [
+        CancelAction::class,
+        DoneAction::class,
+        RefuseAction::class,
+        RespondAction::class
+    ];
+    public $files;
 
     /**
      * {@inheritdoc}
@@ -57,21 +81,37 @@ class Tasks extends \yii\db\ActiveRecord
         return 'tasks';
     }
 
+    public function behaviors()
+    {
+        return [
+            'timestamp' => [
+                'class' => TimestampBehavior::class,
+                'attributes' => [
+                    ActiveRecord::EVENT_BEFORE_INSERT => ['dt_add'],
+                ],
+                'value' => new Expression('CURRENT_DATE()'),
+            ],
+        ];
+    }
+
     /**
      * {@inheritdoc}
      */
     public function rules()
     {
         return [
-            [['dt_add', 'expire'], 'date', 'format' => 'php:Y-m-d'],
+            [['expire'], 'date', 'format' => 'php:Y-m-d'],
             [['category_id', 'budget', 'status', 'city_id', 'executor_id', 'customer_id'], 'integer'],
             [['address'], 'string'],
             [['lat', 'long'], 'number'],
             [['files'], 'safe'],
+            [['status'], 'default', 'value' => self::STATUS_NEW],
             [['name', 'description', 'category_id'], 'required'],
             [['name'], 'string', 'min' => 10, 'max' => 255],
             [['description'], 'string', 'min' => 30],
-            [['category_id'], 'exist', 'skipOnError' => false, 'targetClass' => Categories::class, 'targetAttribute' => ['category_id' => 'id']]
+            [['category_id'], 'exist', 'skipOnError' => false, 'targetClass' => Categories::class, 'targetAttribute' => ['category_id' => 'id']],
+            [['customer_id'], 'exist', 'skipOnError' => false, 'targetClass' => User::class, 'targetAttribute' => ['customer_id' => 'id']],
+            [['executor_id'], 'exist', 'skipOnError' => false, 'targetClass' => User::class, 'targetAttribute' => ['executor_id' => 'id']]
         ];
     }
 
@@ -96,7 +136,7 @@ class Tasks extends \yii\db\ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getCategories()
     {
@@ -104,7 +144,7 @@ class Tasks extends \yii\db\ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getCity()
     {
@@ -112,7 +152,7 @@ class Tasks extends \yii\db\ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getReplies()
     {
@@ -120,7 +160,7 @@ class Tasks extends \yii\db\ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getCustomer()
     {
@@ -128,7 +168,7 @@ class Tasks extends \yii\db\ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getFiles()
     {
@@ -136,7 +176,7 @@ class Tasks extends \yii\db\ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getUser()
     {
@@ -144,20 +184,23 @@ class Tasks extends \yii\db\ActiveRecord
     }
 
     /**
-     * @return array|Categories[]|\yii\db\ActiveRecord[]
+     * @return array|Categories[]|ActiveRecord[]
      */
     public function getAllCategories()
     {
         return Categories::find()->select(['id', 'name'])->all();
     }
 
+    /**
+     * @throws Exception
+     */
     public function uploadFile()
     {
-        if(FileHelper::createDirectory($_SERVER['DOCUMENT_ROOT'] . '/uploads')) {
+        if (FileHelper::createDirectory($_SERVER['DOCUMENT_ROOT'] . '/uploads')) {
             $files = UploadedFile::getInstances($this, 'files');
             foreach ($files as $file) {
                 $save = $file->saveAs($_SERVER['DOCUMENT_ROOT'] . '/uploads/' . $file->baseName . '.' . $file->extension);
-                if($save) {
+                if ($save) {
                     $modelFileTask = new TasksFiles();
                     $modelFileTask->id_task = $this->id;
                     $modelFileTask->name = $file->baseName;
@@ -166,6 +209,70 @@ class Tasks extends \yii\db\ActiveRecord
                     $modelFileTask->save();
                 }
             }
+        }
+    }
+
+    /**
+     * @return int
+     */
+    public function getExecutorId(): int
+    {
+        return $this->executor_id;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getCustomerId(): ?int
+    {
+        return $this->customer_id;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAvailableActions(): array
+    {
+        $currentUser = Yii::$app->user->identity->id;
+
+        $modelActions = array_filter(self::AVAILABLE_ACTIONS_MAP, function ($action) use ($currentUser) {
+            return call_user_func([$action, 'checkPermission'], $this, $currentUser);
+        });
+
+        $actions = [];
+        foreach ($modelActions as $modelAction) {
+            $actions[] = $modelAction::getAction();
+        }
+        return $actions;
+    }
+
+    /**
+     * @param $action
+     * @return int|void|null
+     */
+    public function getNextStatus($action): ?int
+    {
+        switch (true) {
+
+            case $action === self::ACTION_CANCEL && $this->currentStatus === self::STATUS_NEW:
+
+                return self::STATUS_CANCELED;
+
+            case $action == self::ACTION_RESPOND && $this->currentStatus == self::STATUS_NEW:
+
+                return self::STATUS_IN_WORK;
+
+            case $action === self::ACTION_DONE && $this->currentStatus == self::STATUS_IN_WORK:
+
+                return self::STATUS_COMPLETED;
+
+            case $action === self::ACTION_REFUSE && $this->currentStatus == self::STATUS_IN_WORK:
+
+                return self::STATUS_FAILED;
+
+            default:
+                return null;
+
         }
     }
 

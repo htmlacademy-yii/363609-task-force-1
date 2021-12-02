@@ -2,7 +2,7 @@
 
 namespace frontend\models\db;
 
-use Yii;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "user_files".
@@ -15,7 +15,7 @@ use Yii;
  * @property int|null $created_at
  * @property int|null $updated_at
  */
-class UserFiles extends \yii\db\ActiveRecord
+class UserFiles extends ActiveRecord
 {
     /**
      * {@inheritdoc}

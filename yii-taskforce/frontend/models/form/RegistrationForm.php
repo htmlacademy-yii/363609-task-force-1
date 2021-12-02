@@ -1,4 +1,5 @@
 <?php
+
 namespace frontend\models\form;
 
 use common\models\User;
@@ -28,7 +29,8 @@ class RegistrationForm extends User
     /**
      * @return string[]
      */
-    public function attributeLabels() {
+    public function attributeLabels()
+    {
         return [
             'email' => 'Электронная почта',
             'name' => 'Ваше имя',
