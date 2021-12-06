@@ -21,6 +21,8 @@ AppAsset::register($this);
     <?php $this->registerCsrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
+    <script src="https://api-maps.yandex.ru/2.1/?apikey=e666f398-c983-4bde-8f14-e3fec900592a&lang=ru_RU" type="text/javascript">
+    </script>
 </head>
 <body>
 <?php $this->beginBody() ?>
@@ -167,7 +169,7 @@ AppAsset::register($this);
             <div class="page-footer__copyright">
                 <a>
                     <img class="copyright-logo"
-                         src="./img/academy-logo.png"
+                         src="/img/academy-logo.png"
                          width="185" height="63"
                          alt="Логотип HTML Academy">
                 </a>
@@ -180,16 +182,16 @@ AppAsset::register($this);
             <?php $form = ActiveForm::begin([
                 'action' => ['tasks/respond']
             ]) ?>
-                <?=Html::activeHiddenInput($this->params['model_replies'], 'task_id', ['value' => $this->params['task_id']])?>
-                <p>
-                    <?=Html::activeLabel($this->params['model_replies'],'price', ['class' => 'form-modal-description'])?>
-                    <?=Html::activeTextInput($this->params['model_replies'],'price', ['class' => 'response-form-payment input input-middle input-money'])?>
-                </p>
-                <p>
-                    <?=Html::activeLabel($this->params['model_replies'],'description', ['class' => 'form-modal-description'])?>
-                    <?=Html::activeTextarea($this->params['model_replies'],'description', ['class' => 'input textarea'])?>
-                </p>
-                <button class="button modal-button" type="submit">Отправить</button>
+            <?=Html::activeHiddenInput($this->params['model_replies'], 'task_id', ['value' => $this->params['task_id']])?>
+            <p>
+                <?=Html::activeLabel($this->params['model_replies'],'price', ['class' => 'form-modal-description'])?>
+                <?=Html::activeTextInput($this->params['model_replies'],'price', ['class' => 'response-form-payment input input-middle input-money'])?>
+            </p>
+            <p>
+                <?=Html::activeLabel($this->params['model_replies'],'description', ['class' => 'form-modal-description'])?>
+                <?=Html::activeTextarea($this->params['model_replies'],'description', ['class' => 'input textarea'])?>
+            </p>
+            <button class="button modal-button" type="submit">Отправить</button>
             <?php ActiveForm::end() ?>
             <button class="form-modal-close" type="button">Закрыть</button>
         </section>
@@ -199,27 +201,27 @@ AppAsset::register($this);
             <?php $form = ActiveForm::begin([
                 'action' => ['tasks/done']
             ]) ?>
-                <?=Html::activeHiddenInput($this->params['model_opinions'], 'task_id', ['value' => $this->params['task_id']])?>
-                <input class="visually-hidden completion-input completion-input--yes" type="radio" id="completion-radio--yes" name="completion" value="y">
-                <label class="completion-label completion-label--yes" for="completion-radio--yes">Да</label>
-                <input class="visually-hidden completion-input completion-input--difficult" type="radio" id="completion-radio--yet" name="completion" value="n">
-                <label  class="completion-label completion-label--difficult" for="completion-radio--yet">Возникли проблемы</label>
-                <p>
-                    <?=Html::activeLabel($this->params['model_opinions'],'description', ['class' => 'form-modal-description'])?>
-                    <?=Html::activeTextarea($this->params['model_opinions'],'description', ['class' => 'input textarea', 'rows' => 4])?>
-                </p>
-                <p class="form-modal-description">
-                    Оценка
-                <div class="feedback-card__top--name completion-form-star">
-                    <span class="star-disabled"></span>
-                    <span class="star-disabled"></span>
-                    <span class="star-disabled"></span>
-                    <span class="star-disabled"></span>
-                    <span class="star-disabled"></span>
-                </div>
-                </p>
-                <?=Html::activeHiddenInput($this->params['model_opinions'], 'rate', ['id' => 'rating'])?>
-                <button class="button modal-button" type="submit">Отправить</button>
+            <?=Html::activeHiddenInput($this->params['model_opinions'], 'task_id', ['value' => $this->params['task_id']])?>
+            <input class="visually-hidden completion-input completion-input--yes" type="radio" id="completion-radio--yes" name="completion" value="y">
+            <label class="completion-label completion-label--yes" for="completion-radio--yes">Да</label>
+            <input class="visually-hidden completion-input completion-input--difficult" type="radio" id="completion-radio--yet" name="completion" value="n">
+            <label  class="completion-label completion-label--difficult" for="completion-radio--yet">Возникли проблемы</label>
+            <p>
+                <?=Html::activeLabel($this->params['model_opinions'],'description', ['class' => 'form-modal-description'])?>
+                <?=Html::activeTextarea($this->params['model_opinions'],'description', ['class' => 'input textarea', 'rows' => 4])?>
+            </p>
+            <p class="form-modal-description">
+                Оценка
+            <div class="feedback-card__top--name completion-form-star">
+                <span class="star-disabled"></span>
+                <span class="star-disabled"></span>
+                <span class="star-disabled"></span>
+                <span class="star-disabled"></span>
+                <span class="star-disabled"></span>
+            </div>
+            </p>
+            <?=Html::activeHiddenInput($this->params['model_opinions'], 'rate', ['id' => 'rating'])?>
+            <button class="button modal-button" type="submit">Отправить</button>
             <?php ActiveForm::end() ?>
             <button class="form-modal-close" type="button">Закрыть</button>
         </section>
@@ -235,9 +237,9 @@ AppAsset::register($this);
             <?php $form = ActiveForm::begin([
                 'action' => ['tasks/refuse']
             ]) ?>
-                <?=Html::hiddenInput('task_id', $this->params['task_id'])?>
-                <button class="button__form-modal refusal-button button"
-                        type="submit">Отказаться</button>
+            <?=Html::hiddenInput('task_id', $this->params['task_id'])?>
+            <button class="button__form-modal refusal-button button"
+                    type="submit">Отказаться</button>
             <?php ActiveForm::end() ?>
             <button class="form-modal-close" type="button">Закрыть</button>
         </section>
@@ -262,6 +264,78 @@ AppAsset::register($this);
 </div>
 <div class="overlay"></div>
 <?php $this->endBody() ?>
+<?php if(!empty($this->params['life_address'])) :?>
+    <script src="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@10.2.6/dist/autoComplete.min.js"></script>
+    <script>
+        const autoCompleteJS = new autoComplete({
+            selector: "#autoComplete",
+            placeHolder: "Поиск по адресу...",
+            wrapper: false,
+            threshold: 3,
+            debounce: 1000,
+            data: {
+                src: async (query, a) => {
+                    try {
+                        // Fetch Data from external Source
+                        const source = await fetch(`<?=Url::to(['address-search/index'])?>/?action=address&q=${query}`);
+                        // Data is array of `Objects` | `Strings`
+                        const data = await source.json();
+
+                        return data;
+                    } catch (error) {
+                        return error;
+                    }
+                },
+                // Data 'Object' key to be searched
+                keys: ["address"],
+                cache: false,
+            },
+            resultsList: {
+                element: (list, data) => {
+                    if (!data.results.length) {
+                        // Create "No Results" message element
+                        const message = document.createElement("div");
+                        // Add class to the created element
+                        message.setAttribute("class", "no_result");
+                        // Add message text content
+                        message.innerHTML = `<span>Found No Results for "${data.query}"</span>`;
+                        // Append message element to the results list
+                        list.prepend(message);
+                    }
+                },
+                tag: "ul",
+                id: "autoComplete_list",
+                class: "results_list",
+                destination: "#autoComplete",
+                position: "afterend",
+                maxResults: 5,
+                noResults: true,
+            },
+            resultItem: {
+                tag: "li",
+                class: "autoComplete_result",
+                element: (item, data) => {
+                    item.setAttribute("data-parent", "food-item");
+                },
+                highlight: "autoComplete_highlight",
+                selected: "autoComplete_selected"
+            },
+            events: {
+                input: {
+                    selection: (event) => {
+                        const selection = event.detail.selection.value;
+                        autoCompleteJS.input.value = selection.address;
+
+                        const coordinate = document.getElementById("coordinate");
+                        let ar = selection.address.split(';');
+                        coordinate.value = ar[1];
+                    }
+                }
+            }
+        });
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@10.2.6/dist/css/autoComplete.min.css">
+<?php endif;?>
 </body>
 </html>
 <?php $this->endPage() ?>

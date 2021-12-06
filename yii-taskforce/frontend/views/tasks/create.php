@@ -7,6 +7,7 @@ use yii\helpers\ArrayHelper;
  * @var $model \frontend\models\db\Tasks
  */
 $this->title = 'Создание задания';
+$this->params['life_address'] = true;
 ?>
 <section class="create__task">
     <h1><?=$this->title?></h1>
@@ -49,7 +50,8 @@ $this->title = 'Создание задания';
                 <span style="color: red"><?=$model->getFirstError('files')?></span>
             <?php endif; ?>
             <?=Html::activeLabel($model, 'address')?>
-            <?=Html::activeTextInput($model, 'address', ['class' => 'input-navigation input-middle input', 'type' => 'search'])?>
+            <?=Html::activeTextInput($model, 'address', ['class' => 'input-navigation input-middle input', 'type' => 'search', 'id' => 'autoComplete'])?>
+            <?=Html::activeHiddenInput($model, 'coordinate', ['id' => 'coordinate'])?>
             <span>Укажите адрес исполнения, если задание требует присутствия</span>
             <?php if($model->hasErrors('address')):?>
                 <span style="color: red"><?=$model->getFirstError('address')?></span>
