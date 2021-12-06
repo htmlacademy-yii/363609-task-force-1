@@ -21,7 +21,6 @@ use common\models\User;
  */
 class Messages extends \yii\db\ActiveRecord
 {
-    public $is_mine = false;
     /**
      * {@inheritdoc}
      */
@@ -38,7 +37,7 @@ class Messages extends \yii\db\ActiveRecord
                 'attributes' => [
                     \yii\db\ActiveRecord::EVENT_BEFORE_INSERT => ['published_at'],
                 ],
-                'value' => new \yii\db\Expression('NOW()'),
+                'value' => date('Y-m-d H:i:s'),
             ],
         ];
     }
@@ -90,6 +89,10 @@ class Messages extends \yii\db\ActiveRecord
         return $this->hasOne(User::class, ['id' => 'user_id']);
     }
 
+    /**
+     * @param bool $insert
+     * @return bool
+     */
     public function beforeSave($insert)
     {
         if($this->user_id == $this->task->customer_id)
