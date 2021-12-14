@@ -18,7 +18,6 @@ class m211005_133814_create_messages_table extends Migration
             'user_id' => $this->integer(),
             'message' => $this->text(),
             'published_at' => $this->dateTime(),
-            'is_mine' => $this->boolean()
         ]);
 
         $this->createIndex(

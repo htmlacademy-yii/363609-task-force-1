@@ -174,9 +174,25 @@ class Tasks extends ActiveRecord
     /**
      * @return ActiveQuery
      */
+    public function getExecutor()
+    {
+        return $this->hasOne(User::class, ['id' => 'executor_id']);
+    }
+
+    /**
+     * @return ActiveQuery
+     */
     public function getFiles()
     {
         return $this->hasMany(TasksFiles::class, ['id_task' => 'id']);
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getMessages()
+    {
+        return $this->hasMany(Messages::class, ['task_id' => 'id']);
     }
 
     /**

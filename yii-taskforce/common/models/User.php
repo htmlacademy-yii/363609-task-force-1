@@ -255,7 +255,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function getOpinionsRating()
     {
-        return $this->getOpinions()->average('rate');
+        return round($this->getOpinions()->average('rate'), 2);
     }
 
     /**
