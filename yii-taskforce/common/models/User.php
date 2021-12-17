@@ -30,13 +30,22 @@ use frontend\models\db\Tasks;
  * @property integer $city_id
  * @property string $last_activity
  * @property string $password write-only password
+ * @property string $phone
+ * @property string $skype
+ * @property string $telegram
+ * @property string $birthday
+ * @property string $about
+ * @property boolean $setting_new_message
+ * @property boolean $setting_action_task
+ * @property boolean $setting_new_review
+ * @property boolean $setting_show_contact
+ * @property boolean $setting_hide_profile
  */
 class User extends ActiveRecord implements IdentityInterface
 {
     const STATUS_DELETED = 0;
     const STATUS_INACTIVE = 9;
     const STATUS_ACTIVE = 10;
-
 
     /**
      * {@inheritdoc}
@@ -70,6 +79,10 @@ class User extends ActiveRecord implements IdentityInterface
         return [
             ['status', 'default', 'value' => self::STATUS_ACTIVE],
             ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_INACTIVE, self::STATUS_DELETED]],
+            [['name', 'email', 'photo', 'phone', 'skype', 'telegram'], 'string', 'max' => 255],
+            [['birthday'], 'date'],
+            [['about'], 'string'],
+            [['setting_new_message', 'setting_action_task', 'setting_new_review', 'setting_show_contact', 'setting_hide_profile'], 'boolean']
         ];
     }
 

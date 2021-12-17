@@ -66,7 +66,7 @@ AppAsset::register($this);
                             ['label' => 'Задания', 'url' => ['/'], 'options' => ['class' => 'site-list__item']],
                             ['label' => 'Исполнители', 'url' => ['/'], 'options' => ['class' => 'site-list__item']],
                             ['label' => 'Создать задание', 'url' => ['tasks/create'], 'options' => ['class' => 'site-list__item']],
-                            ['label' => 'Мой профиль', 'url' => ['/'], 'options' => ['class' => 'site-list__item'], 'visible' => !Yii::$app->user->isGuest],
+                            ['label' => 'Мой профиль', 'url' => ['user-profile/index'], 'options' => ['class' => 'site-list__item'], 'visible' => !Yii::$app->user->isGuest],
                         ],
                         'options' => [
                             'class' => 'header-nav__list site-list',
@@ -114,10 +114,10 @@ AppAsset::register($this);
                 <div class="account__pop-up">
                     <ul class="account__pop-up-list">
                         <li>
-                            <a href="#">Мои задания</a>
+                            <a href="<?=Url::to(['user-task/index'])?>">Мои задания</a>
                         </li>
                         <li>
-                            <a href="#">Настройки</a>
+                            <a href="<?=Url::to(['user-profile/index'])?>">Настройки</a>
                         </li>
                         <li>
                             <a href="<?=Url::to(['site/logout'])?>">Выход</a>
