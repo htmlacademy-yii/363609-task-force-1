@@ -5,7 +5,7 @@
  */
 use yii\helpers\Html;
 
-$this->title = 'Редактирование настроек профиля'
+$this->title = 'Редактирование настроек профиля';
 ?>
 <section class="account__redaction-wrapper">
     <h1>Редактирование настроек профиля</h1>
@@ -29,50 +29,46 @@ $this->title = 'Редактирование настроек профиля'
                     </div>
                     <div class="account__input account__input--name">
                         <label for="202">Город</label>
-                        <select class="multiple-select input multiple-select-big" size="1" id="202" name="town[]">
-                            <option value="Moscow">Москва</option>
-                            <option selected="" value="SPB">Санкт-Петербург</option>
-                            <option value="Krasnodar">Краснодар</option>
-                            <option value="Irkutsk">Иркутск</option>
-                            <option value="Vladivostok">Владивосток</option>
-                        </select>
+                        <?= Html::activeDropDownList($model, 'city_id', $model->getCityList(),
+                            ['class' => 'multiple-select input multiple-select-big', 'size' => 1,
+                                'options' => [
+                                    $model->city_id => ['selected' => true]
+                            ]]) ?>
                     </div>
                     <div class="account__input account__input--date">
                         <label for="203">День рождения</label>
-                        <?=Html::activeTextInput($model, 'name', ['class' => 'input-middle input input-date', 'type' => 'date'])?>
+                        <?=Html::activeTextInput($model, 'birthday', ['class' => 'input-middle input input-date', 'type' => 'date'])?>
                     </div>
                     <div class="account__input account__input--info">
                         <label for="204">Информация о себе</label>
-                        <?=Html::activeTextarea($model, 'name', ['class' => 'input textarea', 'rows' => 7])?>
+                        <?=Html::activeTextarea($model, 'about', ['class' => 'input textarea', 'rows' => 7])?>
                     </div>
                 </div>
             </div>
             <h3 class="div-line">Выберите свои специализации</h3>
             <div class="account__redaction-section-wrapper">
                 <div class="search-task__categories account_checkbox--bottom">
-                    <input class="visually-hidden checkbox__input" id="205" type="checkbox" name="" value="" checked>
-                    <label for="205">Курьерские услуги</label>
-                    <input class="visually-hidden checkbox__input" id="206" type="checkbox" name="" value="" checked>
-                    <label for="206">Грузоперевозки</label>
-                    <input class="visually-hidden checkbox__input" id="207" type="checkbox" name="" value="">
-                    <label for="207">Перевод текстов</label>
-                    <input class="visually-hidden checkbox__input" id="208" type="checkbox" name="" value="" checked>
-                    <label for="208">Ремонт транспорта</label>
-                    <input class="visually-hidden checkbox__input" id="209" type="checkbox" name="" value="">
-                    <label for="209">Удалённая помощь</label>
-                    <input class="visually-hidden checkbox__input" id="210" type="checkbox" name="" value="">
-                    <label for="210">Выезд на стрелку</label>
+                    <?= Html::activeCheckboxList($model, 'specialization', $model->getSpecializationList(),
+                        [
+                            'item' => function($index, $label, $name, $checked, $value) use ($model) {
+                                $checked = in_array($value, $model->specialization) ? 'checked' : '';
+                                $return = '<input class="visually-hidden checkbox__input" type="checkbox" name="' . $name . '" value="' . $value . '" id="' . $value . '" ' . $checked . '>';
+                                $return .= '<label class="checkbox" for="' . $value . '">' . $label . '</label>';
+                                return $return;
+                            },
+                            'tag' => false]
+                    ) ?>
                 </div>
             </div>
             <h3 class="div-line">Безопасность</h3>
             <div class="account__redaction-section-wrapper account__redaction">
                 <div class="account__input">
                     <label for="211">Новый пароль</label>
-                    <input class="input textarea" type="password" id="211" name="" value="moiparol">
+                    <?=Html::activePasswordInput($model, 'password', ['class' => 'input textarea'])?>
                 </div>
                 <div class="account__input">
                     <label for="212">Повтор пароля</label>
-                    <input class="input textarea" type="password" id="212" name="" value="moiparol">
+                    <?=Html::activePasswordInput($model, 'passwordRepeat', ['class' => 'input textarea'])?>
                 </div>
             </div>
 
