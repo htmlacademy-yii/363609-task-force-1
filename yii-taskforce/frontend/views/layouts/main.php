@@ -336,6 +336,19 @@ AppAsset::register($this);
     </script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@10.2.6/dist/css/autoComplete.min.css">
 <?php endif;?>
+<script>
+    Dropzone.autoDiscover = false;
+
+    var dropzone = new Dropzone(".dropzone", {url: window.location.href, maxFiles: 6, uploadMultiple: true,
+        acceptedFiles: 'image/*', previewTemplate: '<a href="#"><img data-dz-thumbnail alt="Фото работы"></a>',
+            init: function() {
+                this.on("sending", function(file, xhr, formData){
+                    formData.append("<?=Yii::$app->request->csrfParam; ?>", "<?=Yii::$app->request->getCsrfToken(); ?>");
+                });
+            }
+    }
+    );
+</script>
 </body>
 </html>
 <?php $this->endPage() ?>

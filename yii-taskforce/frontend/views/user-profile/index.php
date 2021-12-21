@@ -4,12 +4,19 @@
  * @var $this \yii\web\View
  */
 use yii\helpers\Html;
+use yii\widgets\ActiveForm;
 
 $this->title = 'Редактирование настроек профиля';
 ?>
 <section class="account__redaction-wrapper">
     <h1>Редактирование настроек профиля</h1>
     <form enctype="multipart/form-data" id="account" method="post">
+        <?php $form = ActiveForm::begin([
+            'enableClientScript' => false,
+            'options' => [
+                'enctype'=>'multipart/form-data',
+            ]
+        ]); ?>
         <div class="account__redaction-section">
             <h3 class="div-line">Настройки аккаунта</h3>
             <div class="account__redaction-section-wrapper">
@@ -82,36 +89,39 @@ $this->title = 'Редактирование настроек профиля';
             <div class="account__redaction-section-wrapper account__redaction">
                 <div class="account__input">
                     <label for="213">Телефон</label>
-                    <input class="input textarea" type="tel" id="213" name="" placeholder="8 (555) 187 44 87">
+                    <?=Html::activeTextInput($model, 'phone', ['class' => 'input textarea'])?>
                 </div>
                 <div class="account__input">
                     <label for="214">Skype</label>
-                    <input class="input textarea" type="password" id="214" name="" placeholder="DenisT">
+                    <?=Html::activeTextInput($model, 'skype', ['class' => 'input textarea'])?>
                 </div>
                 <div class="account__input">
                     <label for="215">Telegram</label>
-                    <input class="input textarea" id="215" name="" placeholder="@DenisT">
+                    <?=Html::activeTextInput($model, 'telegram', ['class' => 'input textarea'])?>
                 </div>
             </div>
             <h3 class="div-line">Настройки сайта</h3>
             <h4>Уведомления</h4>
             <div class="account__redaction-section-wrapper account_section--bottom">
                 <div class="search-task__categories account_checkbox--bottom">
-                    <input class="visually-hidden checkbox__input" id="216" type="checkbox" name="" value="" checked>
-                    <label for="216">Новое сообщение</label>
-                    <input class="visually-hidden checkbox__input" id="217" type="checkbox" name="" value="" checked>
-                    <label for="217">Действия по заданию</label>
-                    <input class="visually-hidden checkbox__input" id="218" type="checkbox" name="" value="" checked>
-                    <label for="218">Новый отзыв</label>
+                    <?=Html::activeCheckbox($model, 'setting_new_message', ['class' => 'visually-hidden checkbox__input', 'label' => false])?>
+                    <?=Html::activeLabel($model, 'setting_new_message')?>
+
+                    <?=Html::activeCheckbox($model, 'setting_action_task', ['class' => 'visually-hidden checkbox__input', 'label' => false])?>
+                    <?=Html::activeLabel($model, 'setting_action_task')?>
+
+                    <?=Html::activeCheckbox($model, 'setting_new_review', ['class' => 'visually-hidden checkbox__input', 'label' => false])?>
+                    <?=Html::activeLabel($model, 'setting_new_review')?>
                 </div>
                 <div class="search-task__categories account_checkbox account_checkbox--secrecy">
-                    <input class="visually-hidden checkbox__input" id="219" type="checkbox" name="" value="">
-                    <label for="219">Показывать мои контакты только заказчику</label>
-                    <input class="visually-hidden checkbox__input" id="220" type="checkbox" name="" value="" checked>
-                    <label for="220">Не показывать мой профиль</label>
+                    <?=Html::activeCheckbox($model, 'setting_show_contact', ['class' => 'visually-hidden checkbox__input', 'label' => false])?>
+                    <?=Html::activeLabel($model, 'setting_show_contact')?>
+
+                    <?=Html::activeCheckbox($model, 'setting_hide_profile', ['class' => 'visually-hidden checkbox__input', 'label' => false])?>
+                    <?=Html::activeLabel($model, 'setting_hide_profile')?>
                 </div>
             </div>
         </div>
-        <button class="button" type="submit">Сохранить изменения</button>
-    </form>
+        <?= Html::submitButton('Сохранить изменения', ['class' => 'button']) ?>
+        <?php ActiveForm::end(); ?>
 </section>
