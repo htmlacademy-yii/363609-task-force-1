@@ -82,7 +82,8 @@ class User extends ActiveRecord implements IdentityInterface
             [['name', 'email', 'photo', 'phone', 'skype', 'telegram'], 'string', 'max' => 255],
             [['birthday'], 'date', 'format' => 'php:Y-m-d'],
             [['about'], 'string'],
-            [['setting_new_message', 'setting_action_task', 'setting_new_review', 'setting_show_contact', 'setting_hide_profile'], 'boolean']
+            [['setting_new_message', 'setting_action_task', 'setting_new_review', 'setting_show_contact', 'setting_hide_profile'], 'boolean'],
+            [['city_id'], 'integer']
         ];
     }
 

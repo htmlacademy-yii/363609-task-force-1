@@ -22,7 +22,7 @@ $this->title = 'Редактирование настроек профиля';
             <div class="account__redaction-section-wrapper">
                 <div class="account__redaction-avatar">
                     <img src="<?=$model->photo?>" width="156" height="156">
-                    <?=Html::activeFileInput($model, 'file', ['id' => 'upload-avatar'])?>
+                    <?=Html::activeFileInput($model, 'photo', ['id' => 'upload-avatar'])?>
                     <label for="upload-avatar" class="link-regular">Сменить аватар</label>
                 </div>
                 <div class="account__redaction">

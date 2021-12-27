@@ -17,7 +17,7 @@ class UserProfileController extends SecuredController
         if(!empty($post)) {
             //если аякс - файлы работ
             if(Yii::$app->request->isAjax) {
-                $model->uploadFile();
+                $model->uploadFiles();
             }
             else {
                 $model->load($post);

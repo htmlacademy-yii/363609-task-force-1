@@ -52,7 +52,7 @@ class ProfileForm extends Model
             [['about', 'password', 'passwordRepeat'], 'string'],
             [['setting_new_message', 'setting_action_task', 'setting_new_review', 'setting_show_contact', 'setting_hide_profile'], 'boolean'],
             [['city_id'], 'integer'],
-            [['photo'], 'safe']
+            [['photo', 'specialization'], 'safe']
         ];
     }
 
@@ -95,10 +95,9 @@ class ProfileForm extends Model
     }
 
     /**
-     * @param $user
      * @throws \yii\base\Exception
      */
-    public function uploadFile()
+    public function uploadFiles()
     {
         if (FileHelper::createDirectory($_SERVER['DOCUMENT_ROOT'] . '/uploads')) {
             $files = UploadedFile::getInstancesByName('file');
@@ -116,14 +115,69 @@ class ProfileForm extends Model
         }
     }
 
+    /**
+     * @return string|void
+     * @throws \yii\base\Exception
+     */
+    public function uploadFile()
+    {
+        if (FileHelper::createDirectory($_SERVER['DOCUMENT_ROOT'] . '/uploads')) {
+            $file = UploadedFile::getInstance($this, 'photo');
+            if(!empty($file)) {
+                $path = '/uploads/' . $file->baseName . '.' . $file->extension;
+                $save = $file->saveAs($_SERVER['DOCUMENT_ROOT'] . $path);
+                if($save)
+                    return $path;
+            }
+        }
+    }
+
+    /**
+     * @param $user
+     */
+    public function setSpecialization($user)
+    {
+        UsersCategories::deleteAll(['user_id' => $user->id]);
+        if(!empty($this->specialization) && is_array($this->specialization)) {
+            foreach ($this->specialization as $item) {
+                $model = new UsersCategories();
+                $model->user_id = $user->id;
+                $model->category_id = $item;
+                $model->save();
+            }
+        }
+    }
+
+    /**
+     * @param $user
+     */
+    public function setPassword($user) {
+        if($this->password === $this->passwordRepeat) {
+            $user->setPassword($this->password);
+            return;
+        }
+        $this->addError('password', 'Введённые пароли не совпадают');
+    }
+
+    /**
+     * @return array
+     * @throws \yii\base\Exception
+     */
     public function save()
     {
         if ($this->validate()) {
             $user = Yii::$app->user->identity;
-            $user->setAttributes($this->attributes);
-            $user->save();
 
-            return $user->getFirstErrors();
+            if($photo = $this->uploadFile())
+                $this->photo = $photo;
+            else
+                $this->photo = $user->photo;
+
+            $user->setAttributes($this->attributes);
+            $this->setSpecialization($user);
+
+            if(!$user->save())
+                return $user->getFirstErrors();
         }
 
         return $this->getFirstErrors();
