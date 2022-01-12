@@ -3,16 +3,17 @@ use yii\helpers\Url;
 
 /* @var $this \yii\web\View */
 /* @var $model \common\models\User */
+/* @var $interval DateTime */
 
 $this->title = $model->name;
 ?>
 <section class="content-view">
     <div class="user__card-wrapper">
         <div class="user__card">
-            <img src="<?=$model->photo?>" width="120" height="120" alt="Аватар пользователя">
+            <img src="<?=$model->photo?>" width="120" height="120" alt="<?=$model->name?>">
             <div class="content-view__headline">
                 <h1><?=$model->name?></h1>
-                <p><?=$model->profile->address?>, <?=$interval->y?> лет</p>
+                <p><?=$model->city->city?>, <?=$interval->y?> лет</p>
                 <div class="profile-mini__name five-stars__rate">
                     <span></span><span></span><span></span><span></span><span class="star-disabled"></span>
                     <b><?=round($model->opinionsRating, 2)?></b>
@@ -25,7 +26,7 @@ $this->title = $model->name;
             </div>
         </div>
         <div class="content-view__description">
-            <p><?=$model->profile->about?></p>
+            <p><?=$model->about?></p>
         </div>
         <div class="user__card-general-information">
             <div class="user__card-info">
@@ -37,9 +38,9 @@ $this->title = $model->name;
                 </div>
                 <h3 class="content-view__h3">Контакты</h3>
                 <div class="user__card-link">
-                    <a class="user__card-link--tel link-regular" href="#"><?=$model->profile->phone?></a>
+                    <a class="user__card-link--tel link-regular" href="#"><?=$model->phone?></a>
                     <a class="user__card-link--email link-regular" href="#"><?=$model->email?></a>
-                    <a class="user__card-link--skype link-regular" href="#"><?=$model->profile->skype?></a>
+                    <a class="user__card-link--skype link-regular" href="#"><?=$model->skype?></a>
                 </div>
             </div>
             <div class="user__card-photo">

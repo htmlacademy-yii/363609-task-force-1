@@ -22,6 +22,7 @@ use yii\web\UploadedFile;
  * @property int $id
  * @property string|null $dt_add
  * @property int|null $category_id
+ * @property int|null $status
  * @property string|null $description
  * @property string|null $expire
  * @property string|null $name
@@ -274,19 +275,19 @@ class Tasks extends ActiveRecord
     {
         switch (true) {
 
-            case $action === self::ACTION_CANCEL && $this->currentStatus === self::STATUS_NEW:
+            case $action === self::ACTION_CANCEL && $this->status === self::STATUS_NEW:
 
                 return self::STATUS_CANCELED;
 
-            case $action == self::ACTION_RESPOND && $this->currentStatus == self::STATUS_NEW:
+            case $action == self::ACTION_RESPOND && $this->status == self::STATUS_NEW:
 
                 return self::STATUS_IN_WORK;
 
-            case $action === self::ACTION_DONE && $this->currentStatus == self::STATUS_IN_WORK:
+            case $action === self::ACTION_DONE && $this->status == self::STATUS_IN_WORK:
 
                 return self::STATUS_COMPLETED;
 
-            case $action === self::ACTION_REFUSE && $this->currentStatus == self::STATUS_IN_WORK:
+            case $action === self::ACTION_REFUSE && $this->status == self::STATUS_IN_WORK:
 
                 return self::STATUS_FAILED;
 

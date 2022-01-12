@@ -13,7 +13,7 @@ use yii\helpers\Url;
             <span></span><span></span><span></span><span></span><span class="star-disabled"></span>
             <b><?=round($model->opinionsRating, 2)?></b>
             <p class="user__search-content">
-                <?=$model->profile->about?>
+                <?=$model->about?>
             </p>
         </div>
         <span class="new-task__time">Был на сайте 25 минут назад</span>

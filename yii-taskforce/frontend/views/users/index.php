@@ -1,6 +1,7 @@
 <?php
 /* @var $this yii\web\View
  * @var $modelUser \common\models\User
+ * @var $dataProvider \yii\data\ActiveDataProvider
  */
 use yii\widgets\ActiveForm;
 use frontend\models\form\UsersForm;

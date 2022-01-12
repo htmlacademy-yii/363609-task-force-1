@@ -5,6 +5,7 @@ namespace frontend\models\form;
 use common\models\User;
 use frontend\models\db\Cities;
 use yii\helpers\ArrayHelper;
+use Yii;
 
 class RegistrationForm extends User
 {
@@ -57,8 +58,11 @@ class RegistrationForm extends User
         $user->name = $this->name;
         $user->city_id = $this->city;
         $user->setPassword($this->password);
-        $user->save();
-
+        if($user->save()) {
+            $auth = Yii::$app->authManager;
+            $user_permission = $auth->getRole('executor');
+            $auth->assign($user_permission, $user->id);
+        }
         return $user;
     }
 

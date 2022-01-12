@@ -41,7 +41,7 @@ class UsersController extends SecuredController
         $completedTasks = Tasks::find()->where(['status' => Tasks::STATUS_COMPLETED, 'executor_id' => $model->id])->count();
 
         $now = new DateTime(); // текущее время на сервере
-        $date = DateTime::createFromFormat("Y-m-d", $model->profile->bd); // задаем дату в любом формате
+        $date = DateTime::createFromFormat("Y-m-d", $model->birthday); // задаем дату в любом формате
         $interval = $now->diff($date); // получаем разницу в виде объекта DateInterval
 
         return $this->render('view',

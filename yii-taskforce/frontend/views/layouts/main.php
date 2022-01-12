@@ -8,6 +8,8 @@ use frontend\assets\AppAsset;
 use yii\widgets\Menu;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
+use frontend\models\helpers\GetData;
+use frontend\models\db\Notice;
 
 AppAsset::register($this);
 ?>
@@ -63,8 +65,8 @@ AppAsset::register($this);
                     <?php
                     echo Menu::widget([
                         'items' => [
-                            ['label' => 'Задания', 'url' => ['/'], 'options' => ['class' => 'site-list__item']],
-                            ['label' => 'Исполнители', 'url' => ['/'], 'options' => ['class' => 'site-list__item']],
+                            ['label' => 'Задания', 'url' => ['tasks/index'], 'options' => ['class' => 'site-list__item']],
+                            ['label' => 'Исполнители', 'url' => ['users/index'], 'options' => ['class' => 'site-list__item']],
                             ['label' => 'Создать задание', 'url' => ['tasks/create'], 'options' => ['class' => 'site-list__item']],
                             ['label' => 'Мой профиль', 'url' => ['user-profile/index'], 'options' => ['class' => 'site-list__item'], 'visible' => !Yii::$app->user->isGuest],
                         ],
@@ -88,18 +90,12 @@ AppAsset::register($this);
                 <div class="header__lightbulb"></div>
                 <div class="lightbulb__pop-up">
                     <h3>Новые события</h3>
-                    <p class="lightbulb__new-task lightbulb__new-task--message">
-                        Новое сообщение в чате
-                        <a href="#" class="link-regular">«Помочь с курсовой»</a>
-                    </p>
-                    <p class="lightbulb__new-task lightbulb__new-task--executor">
-                        Выбран исполнитель для
-                        <a href="#" class="link-regular">«Помочь с курсовой»</a>
-                    </p>
-                    <p class="lightbulb__new-task lightbulb__new-task--close">
-                        Завершено задание
-                        <a href="#" class="link-regular">«Помочь с курсовой»</a>
-                    </p>
+                    <?php foreach (GetData::getNotice() as $item) :?>
+                        <p class="lightbulb__new-task <?=Notice::TYPE_MAP[$item->type]['icon']?>">
+                            <?=Notice::TYPE_MAP[$item->type]['title']?>
+                            <a href="<?=Url::to(['tasks/view', 'id' => $item->task_id])?>" class="link-regular">«<?=$item->task->name?>»</a>
+                        </p>
+                    <?php endforeach; ?>
                 </div>
                 <div class="header__account">
                     <a class="header__account-photo">
@@ -348,6 +344,12 @@ AppAsset::register($this);
             }
     }
     );
+</script>
+<script>
+    var lightbulb = document.getElementsByClassName('header__lightbulb')[0];
+    lightbulb.addEventListener('mouseover', function () {
+        fetch('<?=Url::to(["events/index"])?>');
+    });
 </script>
 </body>
 </html>

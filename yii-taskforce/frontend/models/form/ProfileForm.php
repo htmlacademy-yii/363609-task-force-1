@@ -152,11 +152,13 @@ class ProfileForm extends Model
      * @param $user
      */
     public function setPassword($user) {
-        if($this->password === $this->passwordRepeat) {
-            $user->setPassword($this->password);
-            return;
+        if(!empty($this->password)) {
+            if($this->password === $this->passwordRepeat) {
+                $user->setPassword($this->password);
+                return;
+            }
+            $this->addError('password', 'Введённые пароли не совпадают');
         }
-        $this->addError('password', 'Введённые пароли не совпадают');
     }
 
     /**
@@ -175,6 +177,7 @@ class ProfileForm extends Model
 
             $user->setAttributes($this->attributes);
             $this->setSpecialization($user);
+            $this->setPassword($user);
 
             if(!$user->save())
                 return $user->getFirstErrors();

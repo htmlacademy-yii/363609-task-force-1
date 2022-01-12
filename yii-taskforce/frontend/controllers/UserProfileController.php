@@ -26,7 +26,7 @@ class UserProfileController extends SecuredController
         }
 
         return $this->render('index', [
-            'model' => new ProfileForm()
+            'model' => $model,
         ]);
     }
 }

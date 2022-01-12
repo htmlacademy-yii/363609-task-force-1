@@ -1,6 +1,7 @@
 <?php
 namespace common\models;
 
+use frontend\models\db\Cities;
 use frontend\models\db\Replies;
 use frontend\models\db\UserFavorites;
 use frontend\models\db\UserFiles;
@@ -9,7 +10,6 @@ use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
-use frontend\models\db\Profiles;
 use frontend\models\db\Opinions;
 use frontend\models\db\UsersCategories;
 use frontend\models\db\Tasks;
@@ -67,6 +67,9 @@ class User extends ActiveRecord implements IdentityInterface
                     \yii\db\ActiveRecord::EVENT_BEFORE_INSERT => ['dt_add'],
                 ],
                 'value' => new \yii\db\Expression('CURRENT_DATE()'),
+            ],
+            'timestamp2' => [
+                'class' => TimestampBehavior::class,
             ],
         ];
     }
@@ -249,14 +252,6 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
-     * получение данных профиля
-     */
-    public function getProfile()
-    {
-        return $this->hasOne(Profiles::class, ['user_id' => 'id']);
-    }
-
-    /**
      * получение отзывов о юзере
      */
     public function getOpinions()
@@ -317,4 +312,9 @@ class User extends ActiveRecord implements IdentityInterface
         return Tasks::find()->where(['status' => Tasks::STATUS_COMPLETED, 'executor_id' => $this->id])->all();
     }
 
+
+    public function getCity()
+    {
+        return $this->hasOne(Cities::class, ['id' => 'city_id']);
+    }
 }
