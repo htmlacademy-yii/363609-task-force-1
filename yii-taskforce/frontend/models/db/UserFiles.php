@@ -3,6 +3,8 @@
 namespace frontend\models\db;
 
 use yii\db\ActiveRecord;
+use yii\behaviors\TimestampBehavior;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "user_files".
@@ -17,6 +19,14 @@ use yii\db\ActiveRecord;
  */
 class UserFiles extends ActiveRecord
 {
+    public function behaviors(): array
+    {
+        return [
+            'timestamp' => [
+                'class' => TimestampBehavior::class,
+            ],
+        ];
+    }
     /**
      * {@inheritdoc}
      */

@@ -7,6 +7,7 @@ use frontend\models\db\Opinions;
 use frontend\models\db\Replies;
 use frontend\models\db\Tasks;
 use frontend\models\form\TasksForm;
+use frontend\models\model\NoticeModel;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\NotFoundHttpException;
@@ -138,17 +139,18 @@ class TasksController extends SecuredController
             throw new NotFoundHttpException('Страница не найдена');
         }
 
-        $task = Tasks::findOne(['id' => $get['task']]);
+        $task = Tasks::findOne(['id' => $reply->task_id]);
 
         if ($get['action'] == 'apply' && $task->getNextStatus(Tasks::ACTION_RESPOND) == Tasks::STATUS_IN_WORK) {
-            $reply->updateAttributes(['status' => Replies::STATUS_ACCEPT]);
             $task->updateAttributes(['status' => Tasks::STATUS_IN_WORK, 'executor_id' => $reply->user_id]);
+            $reply->updateAttributes(['status' => Replies::STATUS_ACCEPT]);
+            NoticeModel::addTaskStart($task->id);
             $this->redirect(['tasks/view', 'id' => $task->id]);
         }
 
         if ($get['action'] == 'reject') {
             $reply->updateAttributes(['status' => Replies::STATUS_REJECT]);
-            return ' ';
+            $this->redirect(['tasks/view', 'id' => $task->id]);
         }
     }
 
@@ -161,7 +163,7 @@ class TasksController extends SecuredController
     {
         $post = Yii::$app->request->post();
 
-        if (!empty($post)) {
+        if (empty($post)) {
             throw new NotFoundHttpException('Страница не найдена');
         }
 
@@ -169,6 +171,7 @@ class TasksController extends SecuredController
         if ($reply->load($post) && $reply->validate()) {
             $reply->user_id = Yii::$app->user->identity->id;
             $reply->save();
+            NoticeModel::addNewRespond($reply->task_id);
         }
 
         return $this->redirect(['tasks/view', 'id' => $post['Replies']['task_id']]);
@@ -182,7 +185,7 @@ class TasksController extends SecuredController
     public function actionRefuse()
     {
         $post = Yii::$app->request->post();
-        if (!empty($post) && !empty($post['task_id'])) {
+        if (empty($post) && empty($post['task_id'])) {
             throw new NotFoundHttpException('Страница не найдена');
         }
 
@@ -195,6 +198,7 @@ class TasksController extends SecuredController
 
         if (in_array(Tasks::ACTION_REFUSE, $actions) && $task->getNextStatus(Tasks::ACTION_REFUSE) == Tasks::STATUS_FAILED) {
             $task->updateAttributes(['status' => Tasks::STATUS_FAILED]);
+            NoticeModel::addTaskRefuse($task->id);
         }
 
         return $this->redirect(['tasks/view', 'id' => $post['task_id']]);
@@ -209,7 +213,7 @@ class TasksController extends SecuredController
     {
         $post = Yii::$app->request->post();
 
-        if (!empty($post) && !empty($post['task_id'])) {
+        if (empty($post) && empty($post['task_id'])) {
             throw new NotFoundHttpException('Страница не найдена');
         }
 
@@ -235,7 +239,7 @@ class TasksController extends SecuredController
     public function actionDone()
     {
         $post = Yii::$app->request->post();
-        if (!empty($post)) {
+        if (empty($post)) {
             throw new NotFoundHttpException('Страница не найдена');
         }
 
@@ -251,6 +255,8 @@ class TasksController extends SecuredController
             $transaction = Yii::$app->db->beginTransaction();
 
             $task->updateAttributes(['status' => $post['completion'] == 'y' ? Tasks::STATUS_COMPLETED : Tasks::STATUS_FAILED]);
+
+            NoticeModel::addTaskEnd($task->id);
 
             $opinion = new Opinions();
             $opinion->load($post);

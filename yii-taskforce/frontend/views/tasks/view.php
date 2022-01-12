@@ -102,7 +102,6 @@ $this->params['model_opinions'] = $modelOpinions;
                         </div>
                         <?php if($model->customer_id == Yii::$app->user->identity->id && ($model->status == Tasks::STATUS_NEW && $reply->status == Replies::STATUS_NEW)): ?>
                             <div class="feedback-card__actions">
-                                <?php Pjax::begin(['enablePushState' => false]); ?>
                                 <?= Html::a(
                                     'Подтвердить',
                                     ['tasks/button', 'id' => $reply->id, 'action' => 'apply', 'task' => $model->id],
@@ -113,7 +112,6 @@ $this->params['model_opinions'] = $modelOpinions;
                                     ['tasks/button', 'id' => $reply->id, 'action' => 'reject'],
                                     ['class' => 'button__small-color refusal-button button', 'type' => 'button']
                                 ) ?>
-                                <?php Pjax::end(); ?>
                             </div>
                             <?php endif;?>
                     </div>

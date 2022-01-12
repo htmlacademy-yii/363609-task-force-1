@@ -59,7 +59,6 @@ class UsersForm extends Model
                 ->alias('u')
                 ->where(['u.id' => Yii::$app->authManager->getUserIdsByRole('executor')])
                 ->select(['u.*', 'COUNT(opinions.id)', 'COUNT(tasks.id)'])
-                ->with('profile')
                 ->joinWith([
                     'categories',
                     'tasksExecutor' => function (ActiveQuery $query) use ($sortDirection) {
@@ -76,7 +75,6 @@ class UsersForm extends Model
                 ->alias('u')
                 ->where(['u.id' => Yii::$app->authManager->getUserIdsByRole('executor')])
                 ->select(['u.*'])
-                ->with('profile')
                 ->joinWith([
                     'categories',
                     'favorites',

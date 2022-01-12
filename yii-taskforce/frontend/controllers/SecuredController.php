@@ -29,7 +29,9 @@ class SecuredController extends Controller
 
     public function beforeAction($action)
     {
-        Yii::$app->user->identity->updateAttributes(['last_activity' => new Expression('NOW()')]);
+        if(!Yii::$app->user->isGuest) {
+            Yii::$app->user->identity->updateAttributes(['last_activity' => new Expression('NOW()')]);
+        }
         return parent::beforeAction($action);
     }
 }

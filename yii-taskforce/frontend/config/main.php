@@ -60,7 +60,12 @@ return [
                 [
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'api/messages'
-                ]
+                ],
+                'my-task' => 'user-task/index',
+                'my-task/cancel' => 'user-task/canceled',
+                'my-task/active' => 'user-task/in-work',
+                'my-task/done' => 'user-task/completed',
+                'my-task/expire' => 'user-task/expired'
             ],
         ],
     ],

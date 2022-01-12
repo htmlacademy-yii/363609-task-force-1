@@ -1,6 +1,7 @@
 <?php
 namespace common\models;
 
+use frontend\models\db\Cities;
 use frontend\models\db\Replies;
 use frontend\models\db\UserFavorites;
 use frontend\models\db\UserFiles;
@@ -9,7 +10,6 @@ use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
-use frontend\models\db\Profiles;
 use frontend\models\db\Opinions;
 use frontend\models\db\UsersCategories;
 use frontend\models\db\Tasks;
@@ -30,13 +30,22 @@ use frontend\models\db\Tasks;
  * @property integer $city_id
  * @property string $last_activity
  * @property string $password write-only password
+ * @property string $phone
+ * @property string $skype
+ * @property string $telegram
+ * @property string $birthday
+ * @property string $about
+ * @property boolean $setting_new_message
+ * @property boolean $setting_action_task
+ * @property boolean $setting_new_review
+ * @property boolean $setting_show_contact
+ * @property boolean $setting_hide_profile
  */
 class User extends ActiveRecord implements IdentityInterface
 {
     const STATUS_DELETED = 0;
     const STATUS_INACTIVE = 9;
     const STATUS_ACTIVE = 10;
-
 
     /**
      * {@inheritdoc}
@@ -59,6 +68,9 @@ class User extends ActiveRecord implements IdentityInterface
                 ],
                 'value' => new \yii\db\Expression('CURRENT_DATE()'),
             ],
+            'timestamp2' => [
+                'class' => TimestampBehavior::class,
+            ],
         ];
     }
 
@@ -70,6 +82,11 @@ class User extends ActiveRecord implements IdentityInterface
         return [
             ['status', 'default', 'value' => self::STATUS_ACTIVE],
             ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_INACTIVE, self::STATUS_DELETED]],
+            [['name', 'email', 'photo', 'phone', 'skype', 'telegram'], 'string', 'max' => 255],
+            [['birthday'], 'date', 'format' => 'php:Y-m-d'],
+            [['about'], 'string'],
+            [['setting_new_message', 'setting_action_task', 'setting_new_review', 'setting_show_contact', 'setting_hide_profile'], 'boolean'],
+            [['city_id'], 'integer']
         ];
     }
 
@@ -235,14 +252,6 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
-     * получение данных профиля
-     */
-    public function getProfile()
-    {
-        return $this->hasOne(Profiles::class, ['user_id' => 'id']);
-    }
-
-    /**
      * получение отзывов о юзере
      */
     public function getOpinions()
@@ -255,7 +264,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function getOpinionsRating()
     {
-        return $this->getOpinions()->average('rate');
+        return round($this->getOpinions()->average('rate'), 2);
     }
 
     /**
@@ -303,4 +312,9 @@ class User extends ActiveRecord implements IdentityInterface
         return Tasks::find()->where(['status' => Tasks::STATUS_COMPLETED, 'executor_id' => $this->id])->all();
     }
 
+
+    public function getCity()
+    {
+        return $this->hasOne(Cities::class, ['id' => 'city_id']);
+    }
 }

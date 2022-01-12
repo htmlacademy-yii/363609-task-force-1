@@ -8,6 +8,8 @@ use frontend\assets\AppAsset;
 use yii\widgets\Menu;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
+use frontend\models\helpers\GetData;
+use frontend\models\db\Notice;
 
 AppAsset::register($this);
 ?>
@@ -63,10 +65,10 @@ AppAsset::register($this);
                     <?php
                     echo Menu::widget([
                         'items' => [
-                            ['label' => 'Задания', 'url' => ['/'], 'options' => ['class' => 'site-list__item']],
-                            ['label' => 'Исполнители', 'url' => ['/'], 'options' => ['class' => 'site-list__item']],
+                            ['label' => 'Задания', 'url' => ['tasks/index'], 'options' => ['class' => 'site-list__item']],
+                            ['label' => 'Исполнители', 'url' => ['users/index'], 'options' => ['class' => 'site-list__item']],
                             ['label' => 'Создать задание', 'url' => ['tasks/create'], 'options' => ['class' => 'site-list__item']],
-                            ['label' => 'Мой профиль', 'url' => ['/'], 'options' => ['class' => 'site-list__item'], 'visible' => !Yii::$app->user->isGuest],
+                            ['label' => 'Мой профиль', 'url' => ['user-profile/index'], 'options' => ['class' => 'site-list__item'], 'visible' => !Yii::$app->user->isGuest],
                         ],
                         'options' => [
                             'class' => 'header-nav__list site-list',
@@ -88,18 +90,12 @@ AppAsset::register($this);
                 <div class="header__lightbulb"></div>
                 <div class="lightbulb__pop-up">
                     <h3>Новые события</h3>
-                    <p class="lightbulb__new-task lightbulb__new-task--message">
-                        Новое сообщение в чате
-                        <a href="#" class="link-regular">«Помочь с курсовой»</a>
-                    </p>
-                    <p class="lightbulb__new-task lightbulb__new-task--executor">
-                        Выбран исполнитель для
-                        <a href="#" class="link-regular">«Помочь с курсовой»</a>
-                    </p>
-                    <p class="lightbulb__new-task lightbulb__new-task--close">
-                        Завершено задание
-                        <a href="#" class="link-regular">«Помочь с курсовой»</a>
-                    </p>
+                    <?php foreach (GetData::getNotice() as $item) :?>
+                        <p class="lightbulb__new-task <?=Notice::TYPE_MAP[$item->type]['icon']?>">
+                            <?=Notice::TYPE_MAP[$item->type]['title']?>
+                            <a href="<?=Url::to(['tasks/view', 'id' => $item->task_id])?>" class="link-regular">«<?=$item->task->name?>»</a>
+                        </p>
+                    <?php endforeach; ?>
                 </div>
                 <div class="header__account">
                     <a class="header__account-photo">
@@ -114,10 +110,10 @@ AppAsset::register($this);
                 <div class="account__pop-up">
                     <ul class="account__pop-up-list">
                         <li>
-                            <a href="#">Мои задания</a>
+                            <a href="<?=Url::to(['user-task/index'])?>">Мои задания</a>
                         </li>
                         <li>
-                            <a href="#">Настройки</a>
+                            <a href="<?=Url::to(['user-profile/index'])?>">Настройки</a>
                         </li>
                         <li>
                             <a href="<?=Url::to(['site/logout'])?>">Выход</a>
@@ -336,6 +332,25 @@ AppAsset::register($this);
     </script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@10.2.6/dist/css/autoComplete.min.css">
 <?php endif;?>
+<script>
+    Dropzone.autoDiscover = false;
+
+    var dropzone = new Dropzone(".dropzone", {url: window.location.href, maxFiles: 6, uploadMultiple: true,
+        acceptedFiles: 'image/*', previewTemplate: '<a href="#"><img data-dz-thumbnail alt="Фото работы"></a>',
+            init: function() {
+                this.on("sending", function(file, xhr, formData){
+                    formData.append("<?=Yii::$app->request->csrfParam; ?>", "<?=Yii::$app->request->getCsrfToken(); ?>");
+                });
+            }
+    }
+    );
+</script>
+<script>
+    var lightbulb = document.getElementsByClassName('header__lightbulb')[0];
+    lightbulb.addEventListener('mouseover', function () {
+        fetch('<?=Url::to(["events/index"])?>');
+    });
+</script>
 </body>
 </html>
 <?php $this->endPage() ?>
