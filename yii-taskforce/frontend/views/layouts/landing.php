@@ -132,6 +132,10 @@ AppAsset::register($this);
                     <?=Html::activePasswordInput($this->params['modelLogin'], 'password', ['class' => 'enter-form-email input input-middle'])?>
                 </p>
                 <?=Html::submitButton('Войти', ['class' => 'button'])?>
+                <?= yii\authclient\widgets\AuthChoice::widget([
+                    'baseAuthUrl' => ['site/login-vk'],
+                    'popupMode' => true,
+                ]) ?>
             <?php ActiveForm::end()?>
         <?php Pjax::end(); ?>
         <button class="form-modal-close" type="button">Закрыть</button>
