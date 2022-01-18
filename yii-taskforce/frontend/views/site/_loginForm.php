@@ -26,4 +26,8 @@ use yii\helpers\Url;
     <?php endif; ?>
 </p>
 <?=Html::submitButton('Войти', ['class' => 'button'])?>
+<?= yii\authclient\widgets\AuthChoice::widget([
+    'baseAuthUrl' => ['site/login-vk'],
+    'popupMode' => true,
+]) ?>
 <?php ActiveForm::end()?>
