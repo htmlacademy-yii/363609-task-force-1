@@ -7,15 +7,15 @@ return [
     ],
     'vendorPath' => dirname(dirname(__DIR__)) . '/vendor',
     'components' => [
-//        'cache' => [
-//            'class' => 'yii\redis\Cache',
-//        ],
-//        'redis' => [
-//            'class' => 'yii\redis\Connection',
-//            'hostname' => 'localhost',
-//            'port' => 6379,
-//            'database' => 0,
-//        ],
+        'redis' => [
+            'class' => 'yii\redis\Connection',
+            'hostname' => 'localhost',
+            'port' => 6379,
+            'database' => 0,
+        ],
+        'cache' => [
+            'class' => 'yii\redis\Cache',
+        ],
         'authManager' => [
             'class' => 'yii\rbac\DbManager',
         ],
