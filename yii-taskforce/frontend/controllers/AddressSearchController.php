@@ -3,6 +3,7 @@ namespace frontend\controllers;
 
 use Yii;
 use GuzzleHttp\Client;
+use yii\caching\TagDependency;
 use yii\helpers\Json;
 use yii\helpers\ArrayHelper;
 use GuzzleHttp\Exception\RequestException;
@@ -21,26 +22,31 @@ class AddressSearchController extends \yii\web\Controller
             $q = Yii::$app->request->get('q', 'Челябинск');
 
             try {
-                $request = new Client([
-                    'base_uri' => 'https://geocode-maps.yandex.ru/1.x/'
-                ]);
-                $response = $request->request('GET', '', [
-                    'query' => ['apikey' => 'e666f398-c983-4bde-8f14-e3fec900592a', 'format' => 'json', 'geocode' => $q]
-                ]);
+                $address = Yii::$app->cache->getOrSet(md5($q), function () use ($q) {
+                    $request = new Client([
+                        'base_uri' => 'https://geocode-maps.yandex.ru/1.x/'
+                    ]);
+                    $response = $request->request('GET', '', [
+                        'query' => ['apikey' => 'e666f398-c983-4bde-8f14-e3fec900592a', 'format' => 'json', 'geocode' => $q]
+                    ]);
 
-                if ($response->getStatusCode() !== 200) {
-                    return $this->asJson([['address' => '']]);
-                }
+                    if ($response->getStatusCode() !== 200) {
+                        return $this->asJson([['address' => '']]);
+                    }
 
-                $content = $response->getBody()->getContents();
-                $response_data = Json::decode($content, true);
+                    $content = $response->getBody()->getContents();
+                    $response_data = Json::decode($content, true);
 
-                if ($error = ArrayHelper::getValue($response_data, 'error.info')) {
-                    return $this->asJson([['address' => '']]);
-                }
+                    if ($error = ArrayHelper::getValue($response_data, 'error.info')) {
+                        return $this->asJson([['address' => '']]);
+                    }
 
-                $address = $response_data['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['metaDataProperty']['GeocoderMetaData']['AddressDetails']['Country']['AddressLine'] . '; ' .
-                    $response_data['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['Point']['pos'];
+                    $address = $response_data['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['metaDataProperty']['GeocoderMetaData']['AddressDetails']['Country']['AddressLine'] . '; ' .
+                        $response_data['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['Point']['pos'];
+
+                    return $address;
+
+                }, 86400, new TagDependency(['tags' => 'geocoder']));
 
                 return $this->asJson([['address' => $address]]);
             }
