@@ -22,7 +22,7 @@ $this->title = $model->name;
             </div>
             <div class="content-view__headline user__card-bookmark user__card-bookmark--current">
                 <span>Был на сайте <?=$model->last_activity ? date('d.m.Y H:i:s', strtotime($model->last_activity)) : 'давно'?></span>
-                <a href="#"><b></b></a>
+                <a href="#" id="favorite"><b data-user-id="<?=$model->id?>"></b></a>
             </div>
         </div>
         <div class="content-view__description">

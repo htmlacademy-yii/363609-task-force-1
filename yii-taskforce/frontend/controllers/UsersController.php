@@ -5,8 +5,10 @@ namespace frontend\controllers;
 use common\models\User;
 use DateTime;
 use frontend\models\db\Tasks;
+use frontend\models\db\UserFavorites;
 use frontend\models\form\UsersForm;
 use Yii;
+use yii\web\NotFoundHttpException;
 
 class UsersController extends SecuredController
 {
@@ -54,6 +56,33 @@ class UsersController extends SecuredController
                 'age' => $age ?? null
             ]
         );
+    }
+
+    /**
+     * @return bool|int|void
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
+     */
+    public function actionAddFavorite()
+    {
+        $post = Yii::$app->request->post();
+
+        if (!empty($post) && !empty($post['user'])) {
+            $userId = Yii::$app->user->identity->id;
+            $model = UserFavorites::find()->where(['user_id' => $userId, 'favorite_id' => $post['user']])->one();
+            if (empty($model)) {
+                $model = new UserFavorites();
+                $model->setAttributes([
+                    'user_id' => $userId,
+                    'favorite_id' => $post['user']
+                ]);
+                if ($model->validate()) {
+                    return $model->save();
+                }
+            } else {
+                return $model->delete();
+            }
+        }
     }
 
 }

@@ -79,8 +79,7 @@ class UsersForm extends Model
             $idFavorites = UserFavorites::find()
                 ->where(['user_id' => Yii::$app->user->identity->id])
                 ->select(['favorite_id'])
-                ->asArray()
-                ->all();
+                ->column();
 
             $query->andWhere(['u.id' => $idFavorites]);
         }

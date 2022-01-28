@@ -138,6 +138,9 @@ class ProfileForm extends Model
     public function setSpecialization($user)
     {
         UsersCategories::deleteAll(['user_id' => $user->id]);
+        $auth = Yii::$app->authManager;
+        $user_permission = $auth->getRole('executor');
+        $auth->revoke($user_permission, $user->id);
         if(!empty($this->specialization) && is_array($this->specialization)) {
             foreach ($this->specialization as $item) {
                 $model = new UsersCategories();
@@ -145,6 +148,7 @@ class ProfileForm extends Model
                 $model->category_id = $item;
                 $model->save();
             }
+            $auth->assign($user_permission, $user->id);
         }
     }
 

@@ -356,6 +356,18 @@ AppAsset::register($this);
         })
     })
 </script>
+<script>
+    document.querySelector("#favorite").addEventListener('click', function (e) {
+        e.preventDefault();
+        let formData = new FormData();
+        formData.append('<?=Yii::$app->request->csrfParam; ?>', '<?=Yii::$app->request->getCsrfToken(); ?>');
+        formData.append('user', e.target.dataset.userId);
+        fetch("<?=Url::to(['users/add-favorite'])?>", {
+            method: 'POST',
+            body: formData
+        })
+    })
+</script>
 </body>
 </html>
 <?php $this->endPage() ?>
