@@ -79,12 +79,10 @@ AppAsset::register($this);
             <?php } ?>
             <?php if(!Yii::$app->user->isGuest) {?>
                 <div class="header__town">
-                    <select class="multiple-select input town-select" size="1" name="town[]">
-                        <option value="Moscow">Москва</option>
-                        <option selected value="SPB">Санкт-Петербург</option>
-                        <option value="Krasnodar">Краснодар</option>
-                        <option value="Irkutsk">Иркутск</option>
-                        <option value="Vladivostok">Владивосток</option>
+                    <select class="multiple-select input town-select" size="1" name="city" id="city">
+                    <?php foreach (GetData::getCity() as $item) :?>
+                        <option value="<?=$item->id?>" <?=Yii::$app->session->get('city') == $item->id ? 'selected' : ''?>><?=$item->city?></option>
+                    <?php endforeach; ?>
                     </select>
                 </div>
                 <div class="header__lightbulb"></div>
@@ -108,17 +106,18 @@ AppAsset::register($this);
                     </span>
                 </div>
                 <div class="account__pop-up">
-                    <ul class="account__pop-up-list">
-                        <li>
-                            <a href="<?=Url::to(['user-task/index'])?>">Мои задания</a>
-                        </li>
-                        <li>
-                            <a href="<?=Url::to(['user-profile/index'])?>">Настройки</a>
-                        </li>
-                        <li>
-                            <a href="<?=Url::to(['site/logout'])?>">Выход</a>
-                        </li>
-                    </ul>
+                    <?php
+                    echo Menu::widget([
+                        'items' => [
+                            ['label' => 'Мои задания', 'url' => ['user-task/index']],
+                            ['label' => 'Настройки', 'url' => ['user-profile/index']],
+                            ['label' => 'Выход', 'url' => ['site/logout']],
+                        ],
+                        'options' => [
+                            'class' => 'account__pop-up-list',
+                        ],
+                    ]);
+                    ?>
                 </div>
             <?php } ?>
         </div>
@@ -141,26 +140,21 @@ AppAsset::register($this);
                 </p>
             </div>
             <div class="page-footer__links">
-                <ul class="links__list">
-                    <li class="links__item">
-                        <a href="">Задания</a>
-                    </li>
-                    <li class="links__item">
-                        <a href="">Мой профиль</a>
-                    </li>
-                    <li class="links__item">
-                        <a href="">Исполнители</a>
-                    </li>
-                    <li class="links__item">
-                        <a href="">Регистрация</a>
-                    </li>
-                    <li class="links__item">
-                        <a href="">Создать задание</a>
-                    </li>
-                    <li class="links__item">
-                        <a href="">Справка</a>
-                    </li>
-                </ul>
+                <?php
+                echo Menu::widget([
+                    'items' => [
+                        ['label' => 'Задания', 'url' => ['tasks/index'], 'options' => ['class' => 'links__item']],
+                        ['label' => 'Мой профиль', 'url' => ['user-profile/index'], 'options' => ['class' => 'links__item']],
+                        ['label' => 'Исполнители', 'url' => ['users/index'], 'options' => ['class' => 'links__item']],
+                        ['label' => 'Регистрация', 'url' => ['registration/index'], 'options' => ['class' => 'links__item']],
+                        ['label' => 'Создать задание', 'url' => ['tasks/create'], 'options' => ['class' => 'links__item']],
+                        ['label' => 'Справка', 'url' => ['user-task/index'], 'options' => ['class' => 'links__item']],
+                    ],
+                    'options' => [
+                        'class' => 'links__list',
+                    ],
+                ]);
+                ?>
             </div>
             <div class="page-footer__copyright">
                 <a>
@@ -350,6 +344,17 @@ AppAsset::register($this);
     lightbulb.addEventListener('mouseover', function () {
         fetch('<?=Url::to(["events/index"])?>');
     });
+</script>
+<script>
+    document.querySelector("#city").addEventListener('change', function (e) {
+        let formData = new FormData();
+        formData.append('<?=Yii::$app->request->csrfParam; ?>', '<?=Yii::$app->request->getCsrfToken(); ?>');
+        formData.append('city', e.target.value);
+        fetch("<?=Url::to(['site/set-city'])?>", {
+            method: 'POST',
+            body: formData
+        })
+    })
 </script>
 </body>
 </html>

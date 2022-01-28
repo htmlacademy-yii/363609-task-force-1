@@ -40,15 +40,18 @@ class UsersController extends SecuredController
 
         $completedTasks = Tasks::find()->where(['status' => Tasks::STATUS_COMPLETED, 'executor_id' => $model->id])->count();
 
-        $now = new DateTime(); // текущее время на сервере
-        $date = DateTime::createFromFormat("Y-m-d", $model->birthday); // задаем дату в любом формате
-        $interval = $now->diff($date); // получаем разницу в виде объекта DateInterval
+        if($model->birthday) {
+            $now = new DateTime(); // текущее время на сервере
+            $date = DateTime::createFromFormat("Y-m-d", $model->birthday); // задаем дату в любом формате
+            $interval = $now->diff($date); // получаем разницу в виде объекта DateInterval
+            $age = $interval->y;
+        }
 
         return $this->render('view',
             [
                 'model' => $model,
                 'completedTasks' => $completedTasks,
-                'interval' => $interval
+                'age' => $age ?? null
             ]
         );
     }

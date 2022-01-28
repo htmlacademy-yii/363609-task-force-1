@@ -3,7 +3,7 @@ use yii\helpers\Url;
 
 /* @var $this \yii\web\View */
 /* @var $model \common\models\User */
-/* @var $interval DateTime */
+/* @var $age string */
 
 $this->title = $model->name;
 ?>
@@ -13,7 +13,7 @@ $this->title = $model->name;
             <img src="<?=$model->photo?>" width="120" height="120" alt="<?=$model->name?>">
             <div class="content-view__headline">
                 <h1><?=$model->name?></h1>
-                <p><?=$model->city->city?>, <?=$interval->y?> лет</p>
+                <p><?=$model->city->city?>, <?=$age ? $age . ' лет' : ''?></p>
                 <div class="profile-mini__name five-stars__rate">
                     <span></span><span></span><span></span><span></span><span class="star-disabled"></span>
                     <b><?=round($model->opinionsRating, 2)?></b>
@@ -21,7 +21,7 @@ $this->title = $model->name;
                 <b class="done-task">Выполнил <?=count($model->completedTask)?> заказов</b><b class="done-review">Получил <?=count($model->opinions)?> отзывов</b>
             </div>
             <div class="content-view__headline user__card-bookmark user__card-bookmark--current">
-                <span>Был на сайте 25 минут назад</span>
+                <span>Был на сайте <?=$model->last_activity ? date('d.m.Y H:i:s', strtotime($model->last_activity)) : 'давно'?></span>
                 <a href="#"><b></b></a>
             </div>
         </div>

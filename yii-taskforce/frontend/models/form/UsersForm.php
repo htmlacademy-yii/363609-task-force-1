@@ -42,6 +42,9 @@ class UsersForm extends Model
         ];
     }
 
+    /**
+     * @return array
+     */
     public function getCategoriesList()
     {
         $arCategories = Categories::find()
@@ -50,68 +53,45 @@ class UsersForm extends Model
         return ArrayHelper::map($arCategories, 'id', 'name');
     }
 
+    /**
+     * @return ActiveDataProvider
+     */
     public function getDataProvider()
     {
-        if ($sort = Yii::$app->request->get('sort')) {
-            $sortDirection = substr($sort, 0, 1) === '-' ? 'SORT_DESC' : 'SORT_ASC';
-
-            $query = User::find()
-                ->alias('u')
-                ->where(['u.id' => Yii::$app->authManager->getUserIdsByRole('executor')])
-                ->select(['u.*', 'COUNT(opinions.id)', 'COUNT(tasks.id)'])
-                ->joinWith([
-                    'categories',
-                    'tasksExecutor' => function (ActiveQuery $query) use ($sortDirection) {
-                        $query->orderBy(['COUNT(tasks.id)' => $sortDirection]);
-                    },
-                    'opinions' => function (ActiveQuery $query) use ($sortDirection) {
-                        $query->orderBy(['COUNT(opinions.id)' => $sortDirection]);
-                    },
-                    'favorites',
-                ]);
-        } else {
-
-            $query = User::find()
-                ->alias('u')
-                ->where(['u.id' => Yii::$app->authManager->getUserIdsByRole('executor')])
-                ->select(['u.*'])
-                ->joinWith([
-                    'categories',
-                    'favorites',
-                    'tasksExecutor',
-//                    'tasksExecutor' => function (ActiveQuery $query) {
-//                       // $query->orderBy(['COUNT(tasks.id)' => 'SORT_DESC']);
-//                    },
-                    'opinions'
-//                    'opinions' => function (ActiveQuery $query) {
-//                       // $query->orderBy(['COUNT(opinions.id)' => 'SORT_DESC']);
-//                    }
-                ]);
-
-            if (!empty($this->free)) {
-                $query->andWhere('u.id NOT IN (SELECT executor_id FROM tasks)');
-            }
-            if (!empty($this->haveReviews)) {
-                $query->andWhere('u.id IN (SELECT user_id FROM opinions)');
-            }
-            if (!empty($this->favorites)) {
-                $idFavorites = UserFavorites::find()
-                    ->where(['user_id' => Yii::$app->user->identity->id])
-                    ->select(['favorite_id'])
-                    ->asArray()
-                    ->all();
-
-                $query->andWhere(['u.id' => $idFavorites]);
-            }
-            if (!empty($this->online)) {
-                $query->andWhere('u.last_activity > TIMESTAMP(NOW() - INTERVAL :period MINUTE)', ['period' => 30]);
-            }
-
-            $query->andFilterWhere(['users_categories.category_id' => $this->categories]);
-            $query->andFilterWhere([
-                'like', 'users.name', $this->name,
+        $query = User::find()
+            ->alias('u')
+            ->where(['u.id' => Yii::$app->authManager->getUserIdsByRole('executor')])
+            ->select(['u.*', 'AVG(opinions.rate)'])
+            ->joinWith([
+                'categories',
+                'favorites',
+                'tasksExecutor',
+                'opinions'
             ]);
+
+        if (!empty($this->free)) {
+            $query->andWhere('u.id NOT IN (SELECT executor_id FROM tasks)');
         }
+        if (!empty($this->haveReviews)) {
+            $query->andWhere('u.id IN (SELECT user_id FROM opinions)');
+        }
+        if (!empty($this->favorites)) {
+            $idFavorites = UserFavorites::find()
+                ->where(['user_id' => Yii::$app->user->identity->id])
+                ->select(['favorite_id'])
+                ->asArray()
+                ->all();
+
+            $query->andWhere(['u.id' => $idFavorites]);
+        }
+        if (!empty($this->online)) {
+            $query->andWhere('u.last_activity > TIMESTAMP(NOW() - INTERVAL :period MINUTE)', ['period' => 30]);
+        }
+
+        $query->andFilterWhere(['users_categories.category_id' => $this->categories]);
+        $query->andFilterWhere([
+            'like', 'users.name', $this->name,
+        ]);
 
         $query->groupBy(['u.id']);
 
@@ -126,18 +106,18 @@ class UsersForm extends Model
                         'default' => SORT_DESC
                     ],
                     'rating' => [
-                        'asc' => ['opinions.rate' => SORT_DESC],
-                        'desc' => ['opinions.rate' => SORT_DESC],
+                        'asc' => ['AVG(opinions.rate)' => SORT_ASC],
+                        'desc' => ['AVG(opinions.rate)' => SORT_DESC],
                         'default' => SORT_DESC
                     ],
                     'tasks' => [
-                        'asc' => ['COUNT(tasks.id)' => SORT_ASC],
-                        'desc' => ['COUNT(tasks.id)' => SORT_DESC],
+                        'asc' => ['COUNT(DISTINCT(tasks.id))' => SORT_ASC],
+                        'desc' => ['COUNT(DISTINCT(tasks.id))' => SORT_DESC],
                         'default' => SORT_DESC
                     ],
                     'review' => [
-                        'asc' => ['COUNT(opinions.user_id)' => SORT_ASC],
-                        'desc' => ['COUNT(opinions.user_id)' => SORT_DESC],
+                        'asc' => ['COUNT(DISTINCT(opinions.id))' => SORT_ASC],
+                        'desc' => ['COUNT(DISTINCT(opinions.id))' => SORT_DESC],
                         'default' => SORT_DESC
                     ]
                 ],
