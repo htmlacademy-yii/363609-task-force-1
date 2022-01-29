@@ -134,8 +134,9 @@ class ProfileForm extends Model
             if(!empty($file)) {
                 $path = '/uploads/' . $file->baseName . '.' . $file->extension;
                 $save = $file->saveAs($_SERVER['DOCUMENT_ROOT'] . $path);
-                if($save)
+                if($save) {
                     return $path;
+                }
             }
         }
     }
@@ -182,17 +183,20 @@ class ProfileForm extends Model
         $user = Yii::$app->user->identity;
         if ($this->validate()) {
 
-            if($photo = $this->uploadFile())
+            if($photo = $this->uploadFile()) {
                 $this->photo = $photo;
-            else
+            }
+            else {
                 $this->photo = $user->photo;
+            }
 
             $user->setAttributes($this->attributes);
             $this->setSpecialization($user);
             $this->setPassword($user);
 
-            if(!$user->save())
+            if(!$user->save()) {
                 return $user->getFirstErrors();
+            }
         }
 
         $this->photo = $user->photo;

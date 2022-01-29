@@ -1,9 +1,9 @@
 <?php
 
-namespace frontend\models\helpers;
+namespace src\helpers;
 
 use frontend\models\db\Tasks;
-use frontend\models\interface\ActionInterface;
+use src\interface\ActionInterface;
 
 class DoneAction implements ActionInterface
 {

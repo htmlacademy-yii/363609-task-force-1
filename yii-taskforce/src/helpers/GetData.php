@@ -1,6 +1,6 @@
 <?php
 
-namespace frontend\models\helpers;
+namespace src\helpers;
 
 use frontend\models\db\Cities;
 use frontend\models\db\Notice;

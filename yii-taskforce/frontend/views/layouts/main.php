@@ -8,7 +8,7 @@ use frontend\assets\AppAsset;
 use yii\widgets\Menu;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
-use frontend\models\helpers\GetData;
+use src\helpers\GetData;
 use frontend\models\db\Notice;
 
 AppAsset::register($this);

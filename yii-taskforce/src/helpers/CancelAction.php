@@ -1,11 +1,11 @@
 <?php
 
-namespace frontend\models\helpers;
+namespace src\helpers;
 
 use frontend\models\db\Tasks;
-use frontend\models\interface\ActionInterface;
+use src\interface\ActionInterface;
 
-class RespondAction implements ActionInterface
+class CancelAction implements ActionInterface
 {
     /**
      * @param Tasks $task
@@ -14,7 +14,7 @@ class RespondAction implements ActionInterface
      */
     public static function checkPermission(Tasks $task, int $currentUserId): bool
     {
-        return $task->getExecutorId() != $currentUserId && $task->status == $task::STATUS_NEW;
+        return $task->getCustomerId() == $currentUserId && $task->status == $task::STATUS_NEW;
     }
 
     /**
@@ -22,6 +22,6 @@ class RespondAction implements ActionInterface
      */
     public static function getAction(): string
     {
-        return Tasks::ACTION_RESPOND;
+        return Tasks::ACTION_CANCEL;
     }
 }

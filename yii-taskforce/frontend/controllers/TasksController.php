@@ -8,7 +8,7 @@ use frontend\models\db\Opinions;
 use frontend\models\db\Replies;
 use frontend\models\db\Tasks;
 use frontend\models\form\TasksForm;
-use frontend\models\model\NoticeModel;
+use src\model\NoticeModel;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\NotFoundHttpException;
@@ -82,17 +82,14 @@ class TasksController extends SecuredController
             $replies = $model->getReplies()->andWhere(['user_id' => $userId])->all();
         }
 
-        $modelReplies = new Replies();
-        $modelOpinions = new Opinions();
-
         return $this->render('view',
             [
                 'model' => $model,
                 'interval' => $interval,
                 'replies' => $replies,
                 'actions' => $model->getAvailableActions(),
-                'modelReplies' => $modelReplies,
-                'modelOpinions' => $modelOpinions
+                'modelReplies' => new Replies(),
+                'modelOpinions' => new Opinions()
             ]
         );
     }

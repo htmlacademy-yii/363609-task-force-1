@@ -1,6 +1,6 @@
 <?php
 
-namespace frontend\models\model;
+namespace src\model;
 
 use common\models\User;
 use frontend\models\db\Notice;
@@ -22,8 +22,9 @@ class NoticeModel
 
         $user = User::findOne(['id' => $task->customer_id]);
 
-        if(!$user)
+        if(!$user) {
             return;
+        }
 
         if($user->setting_action_task) {
             $model = new Notice();
@@ -52,8 +53,9 @@ class NoticeModel
 
         $user = User::findOne(['id' => $task->customer_id]);
 
-        if(!$user)
+        if(!$user) {
             return;
+        }
 
         if($user->setting_action_task) {
             $model = new Notice();
@@ -82,8 +84,9 @@ class NoticeModel
 
         $user = User::findOne(['id' => $task->executor_id]);
 
-        if(!$user)
+        if(!$user) {
             return;
+        }
 
         if($user->setting_action_task) {
             $model = new Notice();
@@ -112,8 +115,9 @@ class NoticeModel
 
         $user = User::findOne(['id' => $task->executor_id]);
 
-        if(!$user)
+        if(!$user) {
             return;
+        }
 
         if($user->setting_action_task) {
             $model = new Notice();
@@ -150,8 +154,9 @@ class NoticeModel
 
         $user = User::findOne(['id' => $userMessageId]);
 
-        if(!$user)
+        if(!$user) {
             return;
+        }
 
         if($user->setting_new_message) {
             $model = new Notice();
