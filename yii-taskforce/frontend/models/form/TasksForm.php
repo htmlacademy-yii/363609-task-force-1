@@ -7,6 +7,7 @@ use frontend\models\db\Tasks;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use yii\helpers\ArrayHelper;
+use Yii;
 
 class TasksForm extends Model
 {
@@ -58,7 +59,7 @@ class TasksForm extends Model
 
     public function getDataProvider()
     {
-        $query = Tasks::find();
+        $query = Tasks::find()->with('categories');
 
         $query->where(['tasks.status' => Tasks::STATUS_NEW]);
 
@@ -75,6 +76,18 @@ class TasksForm extends Model
 
         if (!empty($this->distantWork)) {
             $query->andWhere(['city_id' => null]);
+        }
+        else {
+            $city = Yii::$app->session->get('city') ?? Yii::$app->user->identity->city_id;
+            $query->andWhere(['OR',
+                    [
+                        'city_id' => null
+                    ],
+                    [
+                        'city_id' => $city
+                    ]
+                ]
+            );
         }
 
         if (!empty($this->period)) {

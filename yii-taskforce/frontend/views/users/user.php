@@ -1,5 +1,6 @@
 <?php
 use yii\helpers\Url;
+/** @var \common\models\User $model */
 ?>
 <div class="content-view__feedback-card user__search-wrapper">
     <div class="feedback-card__top">
@@ -16,7 +17,7 @@ use yii\helpers\Url;
                 <?=$model->about?>
             </p>
         </div>
-        <span class="new-task__time">Был на сайте 25 минут назад</span>
+        <span class="new-task__time">Был на сайте <?=$model->last_activity ? date('d.m.Y H:i:s', strtotime($model->last_activity)) : 'давно'?></span>
     </div>
     <div class="link-specialization user__search-link--bottom">
         <?php foreach ($model->categories as $category) {?>

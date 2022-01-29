@@ -33,12 +33,18 @@ class ProfileForm extends Model
     public $photo;
     public $file;
 
+    public $photoWork;
+
     public function __construct($config = [])
     {
         parent::__construct($config);
 
         $this->attributes = Yii::$app->user->identity->attributes;
         $this->specialization = $this->getUserSpecialization();
+        $this->photoWork = UserFiles::find()
+            ->where(['id_user' => Yii::$app->user->identity->id])
+            ->select('path')
+            ->all();
     }
 
     /**
@@ -52,7 +58,8 @@ class ProfileForm extends Model
             [['about', 'password', 'passwordRepeat'], 'string'],
             [['setting_new_message', 'setting_action_task', 'setting_new_review', 'setting_show_contact', 'setting_hide_profile'], 'boolean'],
             [['city_id'], 'integer'],
-            [['photo', 'specialization'], 'safe']
+            [['photo', 'specialization'], 'safe'],
+            [['name', 'email'], 'required']
         ];
     }
 
@@ -63,7 +70,8 @@ class ProfileForm extends Model
             'setting_action_task' => 'Действия по заданию',
             'setting_new_review' => 'Новый отзыв',
             'setting_show_contact' => 'Показывать мои контакты только заказчику',
-            'setting_hide_profile' => 'Не показывать мой профиль'
+            'setting_hide_profile' => 'Не показывать мой профиль',
+            'name' => 'Имя',
         ];
     }
 
@@ -126,8 +134,9 @@ class ProfileForm extends Model
             if(!empty($file)) {
                 $path = '/uploads/' . $file->baseName . '.' . $file->extension;
                 $save = $file->saveAs($_SERVER['DOCUMENT_ROOT'] . $path);
-                if($save)
+                if($save) {
                     return $path;
+                }
             }
         }
     }
@@ -138,6 +147,9 @@ class ProfileForm extends Model
     public function setSpecialization($user)
     {
         UsersCategories::deleteAll(['user_id' => $user->id]);
+        $auth = Yii::$app->authManager;
+        $user_permission = $auth->getRole('executor');
+        $auth->revoke($user_permission, $user->id);
         if(!empty($this->specialization) && is_array($this->specialization)) {
             foreach ($this->specialization as $item) {
                 $model = new UsersCategories();
@@ -145,6 +157,7 @@ class ProfileForm extends Model
                 $model->category_id = $item;
                 $model->save();
             }
+            $auth->assign($user_permission, $user->id);
         }
     }
 
@@ -167,22 +180,26 @@ class ProfileForm extends Model
      */
     public function save()
     {
+        $user = Yii::$app->user->identity;
         if ($this->validate()) {
-            $user = Yii::$app->user->identity;
 
-            if($photo = $this->uploadFile())
+            if($photo = $this->uploadFile()) {
                 $this->photo = $photo;
-            else
+            }
+            else {
                 $this->photo = $user->photo;
+            }
 
             $user->setAttributes($this->attributes);
             $this->setSpecialization($user);
             $this->setPassword($user);
 
-            if(!$user->save())
+            if(!$user->save()) {
                 return $user->getFirstErrors();
+            }
         }
 
+        $this->photo = $user->photo;
         return $this->getFirstErrors();
     }
 

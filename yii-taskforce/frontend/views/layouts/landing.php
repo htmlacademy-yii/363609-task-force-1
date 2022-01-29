@@ -85,31 +85,26 @@ AppAsset::register($this);
                 </p>
             </div>
             <div class="page-footer__links">
-                <ul class="links__list">
-                    <li class="links__item">
-                        <a href="">Задания</a>
-                    </li>
-                    <li class="links__item">
-                        <a href="">Мой профиль</a>
-                    </li>
-                    <li class="links__item">
-                        <a href="">Исполнители</a>
-                    </li>
-                    <li class="links__item">
-                        <a href="">Регистрация</a>
-                    </li>
-                    <li class="links__item">
-                        <a href="">Создать задание</a>
-                    </li>
-                    <li class="links__item">
-                        <a href="">Справка</a>
-                    </li>
-                </ul>
+                <?php
+                echo Menu::widget([
+                    'items' => [
+                        ['label' => 'Задания', 'url' => ['tasks/index'], 'options' => ['class' => 'links__item']],
+                        ['label' => 'Мой профиль', 'url' => ['user-profile/index'], 'options' => ['class' => 'links__item']],
+                        ['label' => 'Исполнители', 'url' => ['users/index'], 'options' => ['class' => 'links__item']],
+                        ['label' => 'Регистрация', 'url' => ['registration/index'], 'options' => ['class' => 'links__item']],
+                        ['label' => 'Создать задание', 'url' => ['tasks/create'], 'options' => ['class' => 'links__item']],
+                        ['label' => 'Справка', 'url' => ['user-task/index'], 'options' => ['class' => 'links__item']],
+                    ],
+                    'options' => [
+                        'class' => 'links__list',
+                    ],
+                ]);
+                ?>
             </div>
             <div class="page-footer__copyright">
                 <a href="https://htmlacademy.ru">
                     <img class="copyright-logo"
-                         src="./img/academy-logo.png"
+                         src="/img/academy-logo.png"
                          width="185" height="63"
                          alt="Логотип HTML Academy">
                 </a>

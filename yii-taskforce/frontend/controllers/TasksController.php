@@ -3,11 +3,12 @@
 namespace frontend\controllers;
 
 use DateTime;
+use frontend\models\db\Cities;
 use frontend\models\db\Opinions;
 use frontend\models\db\Replies;
 use frontend\models\db\Tasks;
 use frontend\models\form\TasksForm;
-use frontend\models\model\NoticeModel;
+use src\model\NoticeModel;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\NotFoundHttpException;
@@ -81,17 +82,14 @@ class TasksController extends SecuredController
             $replies = $model->getReplies()->andWhere(['user_id' => $userId])->all();
         }
 
-        $modelReplies = new Replies();
-        $modelOpinions = new Opinions();
-
         return $this->render('view',
             [
                 'model' => $model,
                 'interval' => $interval,
                 'replies' => $replies,
                 'actions' => $model->getAvailableActions(),
-                'modelReplies' => $modelReplies,
-                'modelOpinions' => $modelOpinions
+                'modelReplies' => new Replies(),
+                'modelOpinions' => new Opinions()
             ]
         );
     }
@@ -110,10 +108,19 @@ class TasksController extends SecuredController
             $model->lat = $coordinate[1] ?? null;
             $model->long = $coordinate[0] ?? null;
             $model->address = explode(';', $model->address)[0] ?? null;
-            if ($model->save())
+            if(!empty($model->address)) {
+                $address = explode(',', $model->address);
+                array_walk($address, function (&$item) {
+                    $item = trim($item);
+                });
+                $city = Cities::find()->where(['city' => $address])->select(['id'])->one();
+                $model->city_id = $city->id ?? null;
+            }
+            if ($model->save()) {
                 $model->uploadFile();
 
-            $this->redirect(['tasks/index']);
+                $this->redirect(['tasks/view', 'id' => $model ->id]);
+            }
         }
 
         return $this->render('create', [

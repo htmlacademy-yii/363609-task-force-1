@@ -2,6 +2,8 @@
 /* @var $this yii\web\View
  * @var $modelUser \common\models\User
  * @var $dataProvider \yii\data\ActiveDataProvider
+ * @var $sort string
+ * @var $model UsersForm
  */
 use yii\widgets\ActiveForm;
 use frontend\models\form\UsersForm;
@@ -14,14 +16,14 @@ $this->title = 'Исполнители';
     <div class="user__search-link">
         <p>Сортировать по:</p>
         <ul class="user__search-list">
-            <li class="user__search-item user__search-item--current">
-                <a href="?sort=rating" class="link-regular">Рейтингу</a>
+            <li class="user__search-item <?=$sort == '-rating' ? 'user__search-item--current' : ''?>">
+                <a href="?sort=-rating" class="link-regular">Рейтингу</a>
             </li>
-            <li class="user__search-item">
-                <a href="?sort=tasks" class="link-regular">Числу заказов</a>
+            <li class="user__search-item <?=$sort == '-tasks' ? 'user__search-item--current' : ''?>">
+                <a href="?sort=-tasks" class="link-regular">Числу заказов</a>
             </li>
-            <li class="user__search-item">
-                <a href="?sort=review" class="link-regular">Популярности</a>
+            <li class="user__search-item <?=$sort == '-review' ? 'user__search-item--current' : ''?>">
+                <a href="?sort=-review" class="link-regular">Популярности</a>
             </li>
         </ul>
     </div>
@@ -55,7 +57,7 @@ $this->title = 'Исполнители';
         ]) ?>
             <fieldset class="search-task__categories">
                 <legend>Категории</legend>
-                <?=Html::activeCheckboxList($model, 'categories', $model->getCategoriesList(), ['tag' => false, 'value' => $get['categories']??'',
+                <?=Html::activeCheckboxList($model, 'categories', $model->getCategoriesList(), ['tag' => false, 'value' => $model->categories,
                     'item' => function ($index, $label, $name, $checked, $value) {
                         $checked = $checked ? 'checked' : '';
                         return

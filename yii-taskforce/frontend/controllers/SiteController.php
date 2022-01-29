@@ -3,6 +3,7 @@
 namespace frontend\controllers;
 
 use common\models\LoginForm;
+use frontend\models\db\Tasks;
 use Yii;
 use yii\web\Controller;
 use frontend\models\db\Auth;
@@ -24,10 +25,6 @@ class SiteController extends Controller
             'error' => [
                 'class' => 'yii\web\ErrorAction',
             ],
-            'captcha' => [
-                'class' => 'yii\captcha\CaptchaAction',
-                'fixedVerifyCode' => YII_ENV_TEST ? 'testme' : null,
-            ],
             'login-vk' => [
                 'class' => 'yii\authclient\AuthAction',
                 'successCallback' => [$this, 'onAuthSuccess'],
@@ -47,12 +44,21 @@ class SiteController extends Controller
         }
 
         $model = new LoginForm();
+        $task = Tasks::find()
+            ->with('categories')
+            ->orderBy('dt_add DESC')
+            ->limit(4)
+            ->all();
 
         return $this->render('index', [
-            'model' => $model
+            'model' => $model,
+            'task' => $task
         ]);
     }
 
+    /**
+     * @return string|void|\yii\web\Response
+     */
     public function actionLogin()
     {
         $model = new LoginForm();
@@ -81,6 +87,11 @@ class SiteController extends Controller
     }
 
 
+    /**
+     * @param $client
+     * @throws \yii\base\Exception
+     * @throws \yii\db\Exception
+     */
     public function onAuthSuccess($client)
     {
         $attributes = $client->getUserAttributes();
@@ -142,6 +153,17 @@ class SiteController extends Controller
                     'source_id' => (string)$attributes['id'],
                 ]);
                 $auth->save();
+            }
+        }
+    }
+
+    public function actionSetCity()
+    {
+        $post = Yii::$app->request->post();
+        if(!empty($post) && !empty($post['city'])) {
+            $session = Yii::$app->session;
+            if($session->isActive) {
+                $session->set('city', $post['city']);
             }
         }
     }

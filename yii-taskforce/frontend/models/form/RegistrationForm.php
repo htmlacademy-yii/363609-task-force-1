@@ -60,7 +60,7 @@ class RegistrationForm extends User
         $user->setPassword($this->password);
         if($user->save()) {
             $auth = Yii::$app->authManager;
-            $user_permission = $auth->getRole('executor');
+            $user_permission = $auth->getRole('organizer');
             $auth->assign($user_permission, $user->id);
         }
         return $user;

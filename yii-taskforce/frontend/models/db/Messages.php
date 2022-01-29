@@ -2,7 +2,7 @@
 
 namespace frontend\models\db;
 
-use frontend\models\model\NoticeModel;
+use src\model\NoticeModel;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use frontend\models\db\Tasks;

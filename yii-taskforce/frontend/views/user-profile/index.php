@@ -113,6 +113,13 @@ $this->title = 'Редактирование настроек профиля';
             <h3 class="div-line">Фото работ</h3>
 
             <div class="account__redaction-section-wrapper account__redaction">
+                <?php foreach ($model->photoWork as $item):?>
+                    <a href="<?=$item->path?>" download="">
+                        <img src="<?=$item->path?>" width="100" height="100" alt="Фото работы">
+                    </a>
+                <?php endforeach;?>
+            </div>
+            <div class="account__redaction-section-wrapper account__redaction">
                 <span class="dropzone">Выбрать фотографии</span>
             </div>
 

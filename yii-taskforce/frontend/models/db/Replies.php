@@ -54,12 +54,13 @@ class Replies extends ActiveRecord
     public function rules()
     {
         return [
-            [['rate', 'user_id', 'task_id', 'status', 'price'], 'integer'],
+            [['rate', 'user_id', 'task_id', 'status'], 'integer'],
             [['description'], 'string'],
             [['status'], 'default', 'value' => self::STATUS_NEW],
             [['user_id'], 'exist', 'skipOnError' => false, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
             [['task_id'], 'exist', 'skipOnError' => false, 'targetClass' => Tasks::class, 'targetAttribute' => ['task_id' => 'id']],
-            [['price'], 'integer', 'min' => 0]
+            [['price'], 'integer', 'min' => 0],
+            [['price'], 'required']
         ];
     }
 

@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use frontend\models\db\UserFiles;
 use frontend\models\form\ProfileForm;
 use Yii;
 use yii\web\UploadedFile;

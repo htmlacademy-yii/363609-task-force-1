@@ -4,6 +4,7 @@ namespace frontend\models\db;
 
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use common\models\User;
 
 /**
  * This is the model class for table "user_favorites".
@@ -12,8 +13,8 @@ use yii\db\ActiveRecord;
  * @property int $user_id
  * @property int $favorite_id
  *
- * @property Users $favorite
- * @property Users $user
+ * @property User $favorite
+ * @property User $user
  */
 class UserFavorites extends ActiveRecord
 {
@@ -33,8 +34,8 @@ class UserFavorites extends ActiveRecord
         return [
             [['user_id', 'favorite_id'], 'required'],
             [['user_id', 'favorite_id'], 'integer'],
-            [['favorite_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['favorite_id' => 'id']],
-            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['user_id' => 'id']],
+            [['favorite_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['favorite_id' => 'id']],
+            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
         ];
     }
 
@@ -57,7 +58,7 @@ class UserFavorites extends ActiveRecord
      */
     public function getFavorite()
     {
-        return $this->hasOne(Users::className(), ['id' => 'favorite_id']);
+        return $this->hasOne(User::class, ['id' => 'favorite_id']);
     }
 
     /**
@@ -67,6 +68,6 @@ class UserFavorites extends ActiveRecord
      */
     public function getUser()
     {
-        return $this->hasOne(Users::className(), ['id' => 'user_id']);
+        return $this->hasOne(User::class, ['id' => 'user_id']);
     }
 }

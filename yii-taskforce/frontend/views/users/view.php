@@ -3,7 +3,8 @@ use yii\helpers\Url;
 
 /* @var $this \yii\web\View */
 /* @var $model \common\models\User */
-/* @var $interval DateTime */
+/* @var $age string */
+/* @var $favorite integer */
 
 $this->title = $model->name;
 ?>
@@ -13,16 +14,16 @@ $this->title = $model->name;
             <img src="<?=$model->photo?>" width="120" height="120" alt="<?=$model->name?>">
             <div class="content-view__headline">
                 <h1><?=$model->name?></h1>
-                <p><?=$model->city->city?>, <?=$interval->y?> лет</p>
+                <p><?=$model->city->city ?? ''?>, <?=$age ? $age . ' лет' : ''?></p>
                 <div class="profile-mini__name five-stars__rate">
                     <span></span><span></span><span></span><span></span><span class="star-disabled"></span>
                     <b><?=round($model->opinionsRating, 2)?></b>
                 </div>
                 <b class="done-task">Выполнил <?=count($model->completedTask)?> заказов</b><b class="done-review">Получил <?=count($model->opinions)?> отзывов</b>
             </div>
-            <div class="content-view__headline user__card-bookmark user__card-bookmark--current">
-                <span>Был на сайте 25 минут назад</span>
-                <a href="#"><b></b></a>
+            <div class="content-view__headline user__card-bookmark <?=$favorite ? 'user__card-bookmark--current' : ''?>" id="div-favorite">
+                <span>Был на сайте <?=$model->last_activity ? date('d.m.Y H:i:s', strtotime($model->last_activity)) : 'давно'?></span>
+                <a href="#" id="favorite"><b data-user-id="<?=$model->id?>"></b></a>
             </div>
         </div>
         <div class="content-view__description">
@@ -67,7 +68,7 @@ $this->title = $model->name;
                                 </p>
                             </div>
                             <div class="card__review-rate">
-                                <p class="five-rate big-rate"><?=$review->rate?><span></span></p>
+                                <p class="<?=$review->rate > 3? 'five-rate' : 'three-rate'?> big-rate"><?=$review->rate?><span></span></p>
                             </div>
                         </div>
                     </div>
