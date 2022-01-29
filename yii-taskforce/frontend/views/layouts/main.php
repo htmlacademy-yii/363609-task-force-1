@@ -288,7 +288,7 @@ AppAsset::register($this);
                         // Add class to the created element
                         message.setAttribute("class", "no_result");
                         // Add message text content
-                        message.innerHTML = `<span>Found No Results for "${data.query}"</span>`;
+                        message.innerHTML = `<span>Ничего не найдено по запросу "${data.query}"</span>`;
                         // Append message element to the results list
                         list.prepend(message);
                     }
@@ -365,7 +365,14 @@ AppAsset::register($this);
         fetch("<?=Url::to(['users/add-favorite'])?>", {
             method: 'POST',
             body: formData
-        })
+        }).then((response) => {
+            return response.json();
+        }).then((data) => {
+                if(data.success) {
+                    document.querySelector("#div-favorite").classList.toggle('user__card-bookmark--current');
+                }
+            });
+
     })
 </script>
 </body>

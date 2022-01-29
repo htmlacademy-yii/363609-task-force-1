@@ -56,12 +56,13 @@ class UsersForm extends Model
     /**
      * @return ActiveDataProvider
      */
-    public function getDataProvider()
+    public function search($params)
     {
         $query = User::find()
             ->alias('u')
             ->where(['u.id' => Yii::$app->authManager->getUserIdsByRole('executor')])
             ->select(['u.*', 'AVG(opinions.rate)'])
+            ->groupBy(['u.id'])
             ->joinWith([
                 'categories',
                 'favorites',
@@ -69,41 +70,11 @@ class UsersForm extends Model
                 'opinions'
             ]);
 
-        if (!empty($this->free)) {
-            $query->andWhere('u.id NOT IN (SELECT executor_id FROM tasks)');
-        }
-        if (!empty($this->haveReviews)) {
-            $query->andWhere('u.id IN (SELECT user_id FROM opinions)');
-        }
-        if (!empty($this->favorites)) {
-            $idFavorites = UserFavorites::find()
-                ->where(['user_id' => Yii::$app->user->identity->id])
-                ->select(['favorite_id'])
-                ->column();
-
-            $query->andWhere(['u.id' => $idFavorites]);
-        }
-        if (!empty($this->online)) {
-            $query->andWhere('u.last_activity > TIMESTAMP(NOW() - INTERVAL :period MINUTE)', ['period' => 30]);
-        }
-
-        $query->andFilterWhere(['users_categories.category_id' => $this->categories]);
-        $query->andFilterWhere([
-            'like', 'users.name', $this->name,
-        ]);
-
-        $query->groupBy(['u.id']);
-
-        return new ActiveDataProvider([
+        $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'sort' => [
-                'defaultOrder' => ['create' => SORT_DESC],
+                'defaultOrder' => ['rating' => SORT_DESC],
                 'attributes' => [
-                    'create' => [
-                        'asc' => ['u.created_at' => SORT_ASC],
-                        'desc' => ['u.created_at' => SORT_DESC],
-                        'default' => SORT_DESC
-                    ],
                     'rating' => [
                         'asc' => ['AVG(opinions.rate)' => SORT_ASC],
                         'desc' => ['AVG(opinions.rate)' => SORT_DESC],
@@ -125,6 +96,49 @@ class UsersForm extends Model
                 'pageSize' => 5
             ]
         ]);
+
+        if (!$this->load($params)) {
+            return $dataProvider;
+        }
+
+        /**
+         * Поле «Поиск по имени» сбрасывает все выбранные фильтры...
+         */
+        if($this->name) {
+            $query->andFilterWhere([
+                'like', 'u.name', $this->name,
+            ]);
+            $this->setAttributes([
+                'categories' => null,
+                'free' => null,
+                'online' => null,
+                'haveReviews' => null,
+                'favorites' => null,
+            ]);
+        }
+        else {
+            if (!empty($this->free)) {
+                $query->andWhere('u.id NOT IN (SELECT executor_id FROM tasks WHERE executor_id IS NOT NULL)');
+            }
+            if (!empty($this->haveReviews)) {
+                $query->andWhere('u.id IN (SELECT user_id FROM opinions)');
+            }
+            if (!empty($this->favorites)) {
+                $idFavorites = UserFavorites::find()
+                    ->where(['user_id' => Yii::$app->user->identity->id])
+                    ->select(['favorite_id'])
+                    ->column();
+
+                $query->andWhere(['u.id' => $idFavorites]);
+            }
+            if (!empty($this->online)) {
+                $query->andWhere('u.last_activity > TIMESTAMP(NOW() - INTERVAL :period MINUTE)', ['period' => 30]);
+            }
+
+            $query->andFilterWhere(['users_categories.category_id' => $this->categories]);
+        }
+
+        return $dataProvider;
     }
 
 }

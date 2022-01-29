@@ -17,15 +17,13 @@ class UsersController extends SecuredController
      */
     public function actionIndex()
     {
-        $get = Yii::$app->request->get();
         $model = new UsersForm();
-        $model->load($get);
 
         return $this->render('index',
             [
                 'model' => $model,
-                'get' => $get['UsersForm'] ?? '',
-                'dataProvider' => $model->getDataProvider()
+                'dataProvider' => $model->search(Yii::$app->request->get()),
+                'sort' => Yii::$app->request->get('sort', '-rating')
             ]);
     }
 
@@ -49,17 +47,26 @@ class UsersController extends SecuredController
             $age = $interval->y;
         }
 
+        $favorite = UserFavorites::find()
+            ->where(
+                [
+                    'user_id' => Yii::$app->user->identity->id,
+                    'favorite_id' => $model->id
+                ]
+            )
+            ->count();
+
         return $this->render('view',
             [
                 'model' => $model,
                 'completedTasks' => $completedTasks,
-                'age' => $age ?? null
+                'age' => $age ?? null,
+                'favorite' => $favorite
             ]
         );
     }
 
     /**
-     * @return bool|int|void
      * @throws \Throwable
      * @throws \yii\db\StaleObjectException
      */
@@ -77,10 +84,10 @@ class UsersController extends SecuredController
                     'favorite_id' => $post['user']
                 ]);
                 if ($model->validate()) {
-                    return $model->save();
+                    return $this->asJson(['success' => $model->save()]);
                 }
             } else {
-                return $model->delete();
+                return $this->asJson(['success' => (bool)$model->delete()]);
             }
         }
     }

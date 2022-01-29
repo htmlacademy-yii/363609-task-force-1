@@ -30,7 +30,8 @@ class Opinions extends ActiveRecord
     {
         return [
             [['dt_add'], 'safe'],
-            [['rate', 'task_id', 'user_id'], 'integer'],
+            [['task_id', 'user_id'], 'integer'],
+            [['rate'], 'integer', 'min' => 1, 'max' => 5],
             [['description'], 'string'],
             [['user_id'], 'exist', 'skipOnError' => false, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
             [['task_id'], 'exist', 'skipOnError' => false, 'targetClass' => Tasks::class, 'targetAttribute' => ['task_id' => 'id']],

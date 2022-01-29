@@ -3,6 +3,7 @@
 namespace frontend\controllers;
 
 use DateTime;
+use frontend\models\db\Cities;
 use frontend\models\db\Opinions;
 use frontend\models\db\Replies;
 use frontend\models\db\Tasks;
@@ -110,10 +111,19 @@ class TasksController extends SecuredController
             $model->lat = $coordinate[1] ?? null;
             $model->long = $coordinate[0] ?? null;
             $model->address = explode(';', $model->address)[0] ?? null;
-            if ($model->save())
+            if(!empty($model->address)) {
+                $address = explode(',', $model->address);
+                array_walk($address, function (&$item) {
+                    $item = trim($item);
+                });
+                $city = Cities::find()->where(['city' => $address])->select(['id'])->one();
+                $model->city_id = $city->id ?? null;
+            }
+            if ($model->save()) {
                 $model->uploadFile();
 
-            $this->redirect(['tasks/index']);
+                $this->redirect(['tasks/view', 'id' => $model ->id]);
+            }
         }
 
         return $this->render('create', [

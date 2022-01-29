@@ -33,12 +33,18 @@ class ProfileForm extends Model
     public $photo;
     public $file;
 
+    public $photoWork;
+
     public function __construct($config = [])
     {
         parent::__construct($config);
 
         $this->attributes = Yii::$app->user->identity->attributes;
         $this->specialization = $this->getUserSpecialization();
+        $this->photoWork = UserFiles::find()
+            ->where(['id_user' => Yii::$app->user->identity->id])
+            ->select('path')
+            ->all();
     }
 
     /**
@@ -52,7 +58,8 @@ class ProfileForm extends Model
             [['about', 'password', 'passwordRepeat'], 'string'],
             [['setting_new_message', 'setting_action_task', 'setting_new_review', 'setting_show_contact', 'setting_hide_profile'], 'boolean'],
             [['city_id'], 'integer'],
-            [['photo', 'specialization'], 'safe']
+            [['photo', 'specialization'], 'safe'],
+            [['name', 'email'], 'required']
         ];
     }
 
@@ -63,7 +70,8 @@ class ProfileForm extends Model
             'setting_action_task' => 'Действия по заданию',
             'setting_new_review' => 'Новый отзыв',
             'setting_show_contact' => 'Показывать мои контакты только заказчику',
-            'setting_hide_profile' => 'Не показывать мой профиль'
+            'setting_hide_profile' => 'Не показывать мой профиль',
+            'name' => 'Имя',
         ];
     }
 
@@ -171,8 +179,8 @@ class ProfileForm extends Model
      */
     public function save()
     {
+        $user = Yii::$app->user->identity;
         if ($this->validate()) {
-            $user = Yii::$app->user->identity;
 
             if($photo = $this->uploadFile())
                 $this->photo = $photo;
@@ -187,6 +195,7 @@ class ProfileForm extends Model
                 return $user->getFirstErrors();
         }
 
+        $this->photo = $user->photo;
         return $this->getFirstErrors();
     }
 
