@@ -1,6 +1,7 @@
 <?php
 namespace console\controllers;
 
+use common\models\User;
 use Yii;
 use yii\console\Controller;
 
@@ -47,5 +48,13 @@ class TaskForceRbacController extends Controller
         //админу - всё
         $auth->addChild($admin, $completingAssignments);
         $auth->addChild($admin, $creationTasks);
+
+        //поставим всем юзерам доступы создателя заданий
+        $user = User::find()->select(['id'])->all();
+        $user_permission = $auth->getRole('organizer');
+        foreach ($user as $item) {
+            $auth->assign($user_permission, $item->id);
+        }
+
     }
 }
