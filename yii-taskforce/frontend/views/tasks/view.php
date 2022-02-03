@@ -11,7 +11,7 @@ use frontend\models\db\Replies;
 /* @var Replies $modelReplies */
 /* @var \frontend\models\db\Opinions $modelOpinions */
 
-$this->title = $model->name;
+$this->title = Html::encode($model->name);
 $this->params['modals_actions'] = true;
 $this->params['task_id'] = $model->id;
 $this->params['model_replies'] = $modelReplies;
@@ -22,7 +22,7 @@ $this->params['model_opinions'] = $modelOpinions;
         <div class="content-view__card-wrapper">
             <div class="content-view__header">
                 <div class="content-view__headline">
-                    <h1><?=$model->name?></h1>
+                    <h1><?=Html::encode($model->name)?></h1>
                     <span>Размещено в категории
                                     <a href="#" class="link-regular"><?=$model->categories->name?></a>
                                     <?=Yii::$app->formatter->asDate($model->dt_add, 'php:d.m.Y')?></span>
@@ -33,7 +33,7 @@ $this->params['model_opinions'] = $modelOpinions;
             <div class="content-view__description">
                 <h3 class="content-view__h3">Общее описание</h3>
                 <p>
-                    <?=$model->description?>
+                    <?=Html::encode($model->description)?>
                 </p>
             </div>
             <?php if($model->files) :?>
@@ -96,7 +96,7 @@ $this->params['model_opinions'] = $modelOpinions;
                         </div>
                         <div class="feedback-card__content">
                             <p>
-                                <?=$reply->description?>
+                                <?=Html::encode($reply->description)?>
                             </p>
                             <span><?=$reply->price?> ₽</span>
                         </div>
@@ -127,7 +127,7 @@ $this->params['model_opinions'] = $modelOpinions;
             <div class="profile-mini__top">
                 <img src="<?=$model->customer->photo?>" width="62" height="62" alt="Аватар заказчика">
                 <div class="profile-mini__name five-stars__rate">
-                    <p><?=$model->customer->name?></p>
+                    <p><?=Html::encode($model->customer->name)?></p>
                 </div>
             </div>
             <p class="info-customer"><span><?=count($model->customer->tasksCustomer)?> заданий</span><span class="last-"><?=$interval->y?> год на сайте</span></p>

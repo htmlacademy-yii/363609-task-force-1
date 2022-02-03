@@ -38,7 +38,7 @@ class AddressSearchController extends \yii\web\Controller
                     $content = $response->getBody()->getContents();
                     $response_data = Json::decode($content, true);
 
-                    if ($error = ArrayHelper::getValue($response_data, 'error.info')) {
+                    if (ArrayHelper::getValue($response_data, 'error.info')) {
                         return $this->asJson([['address' => '']]);
                     }
 

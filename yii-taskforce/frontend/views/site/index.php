@@ -1,6 +1,7 @@
 <?php
 use yii\helpers\Url;
 use yii\helpers\StringHelper;
+use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model \common\models\LoginForm */
 /* @var $task array|\frontend\models\db\Tasks[] */
@@ -107,8 +108,8 @@ $this->params['modelLogin'] = $model;
             <div class="landing-task">
                 <div class="landing-task-top task-<?=$item->categories->icon?>"></div>
                 <div class="landing-task-description">
-                    <h3><a href="<?=Url::to(['tasks/view', 'id' => $item->id])?>" class="link-regular"><?=StringHelper::truncate($item->name,20,'...')?></a></h3>
-                    <p><?=StringHelper::truncate($item->description,20,'...')?></p>
+                    <h3><a href="<?=Url::to(['tasks/view', 'id' => $item->id])?>" class="link-regular"><?=StringHelper::truncate(Html::encode($item->name),20,'...')?></a></h3>
+                    <p><?=StringHelper::truncate(Html::encode($item->description),20,'...')?></p>
                 </div>
                 <div class="landing-task-info">
                     <div class="task-info-left">

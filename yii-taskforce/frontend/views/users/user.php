@@ -1,5 +1,6 @@
 <?php
 use yii\helpers\Url;
+use yii\helpers\Html;
 /** @var \common\models\User $model */
 ?>
 <div class="content-view__feedback-card user__search-wrapper">
@@ -10,11 +11,11 @@ use yii\helpers\Url;
             <span><?=count($model->opinions)?> отзывов</span>
         </div>
         <div class="feedback-card__top--name user__search-card">
-            <p class="link-name"><a href="<?=Url::to(['users/view', 'id' => $model->id])?>" class="link-regular"><?=$model->name?></a></p>
+            <p class="link-name"><a href="<?=Url::to(['users/view', 'id' => $model->id])?>" class="link-regular"><?=Html::encode($model->name)?></a></p>
             <span></span><span></span><span></span><span></span><span class="star-disabled"></span>
             <b><?=round($model->opinionsRating, 2)?></b>
             <p class="user__search-content">
-                <?=$model->about?>
+                <?=Html::encode($model->about)?>
             </p>
         </div>
         <span class="new-task__time">Был на сайте <?=$model->last_activity ? date('d.m.Y H:i:s', strtotime($model->last_activity)) : 'давно'?></span>

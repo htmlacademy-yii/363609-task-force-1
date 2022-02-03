@@ -1,18 +1,19 @@
 <?php
 use frontend\models\db\Tasks;
 use yii\helpers\Url;
+use yii\helpers\Html;
 
 /* @var $this \yii\web\View */
 /* @var $model \frontend\models\db\Tasks */
 ?>
 <div class="new-task__card">
     <div class="new-task__title">
-        <a href="<?=Url::to(['tasks/view', 'id' => $model->id])?>" class="link-regular"><h2><?=$model->name?></h2></a>
+        <a href="<?=Url::to(['tasks/view', 'id' => $model->id])?>" class="link-regular"><h2><?=Html::encode($model->name)?></h2></a>
         <a  class="new-task__type link-regular" href="#"><p><?=$model->categories->name?></p></a>
     </div>
     <div class="task-status done-status"><?=Tasks::STATUSES_LIST[$model->status]?></div>
     <p class="new-task_description">
-        <?=$model->description?>
+        <?=Html::encode($model->description)?>
     </p>
     <?php if(!empty($model->executor_id)): ?>
         <div class="feedback-card__top ">

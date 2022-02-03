@@ -99,10 +99,10 @@ AppAsset::register($this);
                     <a class="header__account-photo">
                         <img src="<?=Yii::$app->user->identity->photo?>"
                              width="43" height="44"
-                             alt="<?=Yii::$app->user->identity->name?>">
+                             alt="<?=Html::encode(Yii::$app->user->identity->name)?>">
                     </a>
                     <span class="header__account-name">
-                     <?=Yii::$app->user->identity->name?>
+                     <?=Html::encode(Yii::$app->user->identity->name)?>
                     </span>
                 </div>
                 <div class="account__pop-up">

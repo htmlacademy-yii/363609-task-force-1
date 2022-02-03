@@ -1,6 +1,6 @@
 <?php
 use yii\helpers\Url;
-
+use yii\helpers\Html;
 /* @var $this \yii\web\View */
 /* @var $model \common\models\User */
 /* @var $age string */
@@ -11,9 +11,9 @@ $this->title = $model->name;
 <section class="content-view">
     <div class="user__card-wrapper">
         <div class="user__card">
-            <img src="<?=$model->photo?>" width="120" height="120" alt="<?=$model->name?>">
+            <img src="<?=$model->photo?>" width="120" height="120" alt="<?=Html::encode($model->name)?>">
             <div class="content-view__headline">
-                <h1><?=$model->name?></h1>
+                <h1><?=Html::encode($model->name)?></h1>
                 <p><?=$model->city->city ?? ''?>, <?=$age ? $age . ' лет' : ''?></p>
                 <div class="profile-mini__name five-stars__rate">
                     <span></span><span></span><span></span><span></span><span class="star-disabled"></span>
@@ -27,7 +27,7 @@ $this->title = $model->name;
             </div>
         </div>
         <div class="content-view__description">
-            <p><?=$model->about?></p>
+            <p><?=Html::encode($model->about)?></p>
         </div>
         <div class="user__card-general-information">
             <div class="user__card-info">
@@ -39,9 +39,9 @@ $this->title = $model->name;
                 </div>
                 <h3 class="content-view__h3">Контакты</h3>
                 <div class="user__card-link">
-                    <a class="user__card-link--tel link-regular" href="#"><?=$model->phone?></a>
-                    <a class="user__card-link--email link-regular" href="#"><?=$model->email?></a>
-                    <a class="user__card-link--skype link-regular" href="#"><?=$model->skype?></a>
+                    <a class="user__card-link--tel link-regular" href="#"><?=Html::encode($model->phone)?></a>
+                    <a class="user__card-link--email link-regular" href="#"><?=Html::encode($model->email)?></a>
+                    <a class="user__card-link--skype link-regular" href="#"><?=Html::encode($model->skype)?></a>
                 </div>
             </div>
             <div class="user__card-photo">
@@ -58,13 +58,13 @@ $this->title = $model->name;
             <div class="content-view__feedback-wrapper reviews-wrapper">
                 <?php foreach ($model->opinions as $review) :?>
                     <div class="feedback-card__reviews">
-                        <p class="link-task link">Задание <a href="<?=Url::to(['tasks/view', 'id' => $review->task->id])?>" class="link-regular">«<?=$review->task->name?>»</a></p>
+                        <p class="link-task link">Задание <a href="<?=Url::to(['tasks/view', 'id' => $review->task->id])?>" class="link-regular">«<?=Html::encode($review->task->name)?>»</a></p>
                         <div class="card__review">
                             <a href="<?=Url::to(['users/view', 'id' => $review->task->user->id])?>"><img src="<?=$review->task->user->photo?>" width="55" height="54"></a>
                             <div class="feedback-card__reviews-content">
-                                <p class="link-name link"><a href="<?=Url::to(['users/view', 'id' => $review->task->user->id])?>" class="link-regular"><?=$review->task->user->name?></a></p>
+                                <p class="link-name link"><a href="<?=Url::to(['users/view', 'id' => $review->task->user->id])?>" class="link-regular"><?=Html::encode($review->task->user->name)?></a></p>
                                 <p class="review-text">
-                                    <?=$review->description?>
+                                    <?=Html::encode($review->description)?>
                                 </p>
                             </div>
                             <div class="card__review-rate">

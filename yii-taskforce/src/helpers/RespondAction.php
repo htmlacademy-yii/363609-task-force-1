@@ -14,7 +14,7 @@ class RespondAction implements ActionInterface
      */
     public static function checkPermission(Tasks $task, int $currentUserId): bool
     {
-        return $task->getExecutorId() != $currentUserId && $task->status == $task::STATUS_NEW;
+        return $task->getExecutorId() != $currentUserId && $task->getCustomerId() != $currentUserId && $task->status == $task::STATUS_NEW;
     }
 
     /**
