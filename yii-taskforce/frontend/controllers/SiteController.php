@@ -8,6 +8,7 @@ use Yii;
 use yii\web\Controller;
 use frontend\models\db\Auth;
 use common\models\User;
+use src\model\AuthModel;
 
 /**
  * Site controller
@@ -109,50 +110,16 @@ class SiteController extends Controller
             } else { // регистрация
                 if (isset($attributes['email']) && User::find()->where(['email' => $attributes['email']])->exists()) {
                     $user = User::find()->where(['email' => $attributes['email']])->one();
-                    $auth = new Auth([
-                        'user_id' => $user->id,
-                        'source' => $client->getId(),
-                        'source_id' => (string)$attributes['id'],
-                    ]);
-                    $auth->save();
+                    $auth = AuthModel::addAuth($user->id, $client, $attributes);
                     $user = $auth->user;
                     Yii::$app->user->login($user);
                 } else {
-                    $password = Yii::$app->security->generateRandomString(6);
-                    $user = new User([
-                        'name' => $attributes['last_name'] . ' ' .  $attributes['first_name'],
-                        'email' => $attributes['email'],
-                        'password' => $password,
-                        'birthday' => $attributes['bdate']
-                    ]);
-                    $user->generateAuthKey();
-                    $user->generatePasswordResetToken();
-                    $transaction = $user->getDb()->beginTransaction();
-                    if ($user->save()) {
-                        $auth = new Auth([
-                            'user_id' => $user->id,
-                            'source' => $client->getId(),
-                            'source_id' => (string)$attributes['id'],
-                        ]);
-                        if ($auth->save()) {
-                            $transaction->commit();
-                            Yii::$app->user->login($user);
-                        } else {
-                            print_r($auth->getErrors());
-                        }
-                    } else {
-                        print_r($user->getErrors());
-                    }
+                    AuthModel::addUser($client, $attributes);
                 }
             }
         } else { // Пользователь уже зарегистрирован
             if (!$auth) { // добавляем внешний сервис аутентификации
-                $auth = new Auth([
-                    'user_id' => Yii::$app->user->id,
-                    'source' => $client->getId(),
-                    'source_id' => (string)$attributes['id'],
-                ]);
-                $auth->save();
+                AuthModel::addAuth(Yii::$app->user->id, $client, $attributes);
             }
         }
     }

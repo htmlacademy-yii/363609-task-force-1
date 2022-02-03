@@ -31,17 +31,6 @@ class Task
         self::ACTION_REFUSE => 'Отказаться',
     ];
 
-//    const AVAILABLE_ACTIONS_MAP = [
-//        self::STATUS_NEW => [
-//            self::ACTION_CANCEL,
-//            self::ACTION_RESPOND
-//        ],
-//        self::STATUS_IN_WORK => [
-//            self::ACTION_DONE,
-//            self::ACTION_REFUSE
-//        ],
-//    ];
-
     private const AVAILABLE_ACTIONS_MAP = [
         CancelAction::class,
         DoneAction::class,
@@ -52,7 +41,6 @@ class Task
     private $executorId;
     private $customerId;
     private $currentUser;
-    //private $currentStatus = self::STATUS_NEW;
     private $currentStatus;
 
     public function __construct(int $executor, int $customer, string $currentStatus = self::STATUS_NEW)
@@ -98,22 +86,18 @@ class Task
             case $action === self::ACTION_CANCEL && $this->currentStatus === self::STATUS_NEW:
 
                 return self::STATUS_CANCELED;
-                break;
 
             case $action === self::ACTION_RESPOND && $this->currentStatus == self::STATUS_NEW:
 
                 return self::STATUS_IN_WORK;
-                break;
 
             case $action === self::ACTION_DONE && $this->currentStatus == self::STATUS_IN_WORK:
 
                 return self::STATUS_COMPLETED;
-                break;
 
             case $action === self::ACTION_REFUSE && $this->currentStatus == self::STATUS_IN_WORK:
 
                 return self::STATUS_FAILED;
-                break;
 
             default:
                 return null;
