@@ -10,6 +10,7 @@ use frontend\models\db\Replies;
 /* @var array $actions */
 /* @var Replies $modelReplies */
 /* @var \frontend\models\db\Opinions $modelOpinions */
+/* @var array|\frontend\models\db\TasksFiles $files */
 
 $this->title = Html::encode($model->name);
 $this->params['modals_actions'] = true;
@@ -27,7 +28,9 @@ $this->params['model_opinions'] = $modelOpinions;
                                     <a href="#" class="link-regular"><?=$model->categories->name?></a>
                                     <?=Yii::$app->formatter->asDate($model->dt_add, 'php:d.m.Y')?></span>
                 </div>
-                <b class="new-task__price new-task__price--clean content-view-price"><?=$model->budget?><b> ₽</b></b>
+                <?php if($model->budget) :?>
+                    <b class="new-task__price new-task__price--clean content-view-price"><?=$model->budget?><b> ₽</b></b>
+                <?php endif;?>
                 <div class="new-task__icon new-task__icon--<?=$model->categories->icon?> content-view-icon"></div>
             </div>
             <div class="content-view__description">
@@ -36,29 +39,26 @@ $this->params['model_opinions'] = $modelOpinions;
                     <?=Html::encode($model->description)?>
                 </p>
             </div>
-            <?php if($model->files) :?>
+            <?php if($files) :?>
                 <div class="content-view__attach">
                     <h3 class="content-view__h3">Вложения</h3>
-                    <?php foreach ($model->files as $file) :?>
+                    <?php foreach ($files as $file) :?>
                         <a href="<?=$file->path?>" download><?=$file->name?></a>
                     <?php endforeach; ?>
                 </div>
             <?php endif;?>
-            <div class="content-view__location">
-                <h3 class="content-view__h3">Расположение</h3>
-                <div class="content-view__location-wrapper">
-                    <div class="content-view__map" id="map" style="width: 361px; height: 292px">
-                    </div>
-                    <div class="content-view__address">
-                        <span><?=$model->address?></span>
-                        <?php /*
-                        <span class="address__town">Москва</span><br>
-                        <span>Новый арбат, 23 к. 1</span>
-                        <p>Вход под арку, код домофона 1122</p>
-                        */?>
+            <?php if($model->address) :?>
+                <div class="content-view__location">
+                    <h3 class="content-view__h3">Расположение</h3>
+                    <div class="content-view__location-wrapper">
+                        <div class="content-view__map" id="map" style="width: 361px; height: 292px">
+                        </div>
+                        <div class="content-view__address">
+                            <span><?=$model->address?></span>
+                        </div>
                     </div>
                 </div>
-            </div>
+            <?php endif;?>
         </div>
         <div class="content-view__action-buttons">
             <?php if(Yii::$app->user->can('executor') && empty($replies) && in_array(Tasks::ACTION_RESPOND, $actions)) :?>
@@ -86,7 +86,7 @@ $this->params['model_opinions'] = $modelOpinions;
                 <?php foreach ($replies as $reply) :?>
                     <div class="content-view__feedback-card">
                         <div class="feedback-card__top">
-                            <a href="<?=Url::to(['users/view', 'id' => $reply->user->id])?>"><img src="<?=$reply->user->photo?>" width="55" height="55"></a>
+                            <a href="<?=Url::to(['users/view', 'id' => $reply->user->id])?>"><img src="<?=$reply->user->photo ?? Yii::$app->params['defaultPhoto']?>" width="55" height="55"></a>
                             <div class="feedback-card__top--name">
                                 <p><a href="<?=Url::to(['users/view', 'id' => $reply->user->id])?>" class="link-regular"><?=$reply->user->name?></a></p>
                                 <span></span><span></span><span></span><span></span><span class="star-disabled"></span>
@@ -125,7 +125,7 @@ $this->params['model_opinions'] = $modelOpinions;
         <div class="profile-mini__wrapper">
             <h3>Заказчик</h3>
             <div class="profile-mini__top">
-                <img src="<?=$model->customer->photo?>" width="62" height="62" alt="Аватар заказчика">
+                <img src="<?=$model->customer->photo ?? '/img/user-photo.png'?>" width="62" height="62" alt="Аватар заказчика">
                 <div class="profile-mini__name five-stars__rate">
                     <p><?=Html::encode($model->customer->name)?></p>
                 </div>

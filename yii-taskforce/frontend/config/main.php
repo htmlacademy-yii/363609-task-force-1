@@ -13,7 +13,12 @@ return [
     'controllerNamespace' => 'frontend\controllers',
     'modules' => [
         'api' => [
-            'class' => 'frontend\modules\api\Module'
+            'class' => 'frontend\modules\api\v1\Module',
+            'modules' => [
+                'v1' => [
+                    'class' => 'frontend\modules\api\v1\Module'
+                ]
+            ]
         ]
     ],
     'components' => [
@@ -59,7 +64,7 @@ return [
                 'task/create' => 'tasks/create',
                 [
                     'class' => 'yii\rest\UrlRule',
-                    'controller' => 'api/messages'
+                    'controller' => 'api/v1/messages'
                 ],
                 'my-task' => 'user-task/index',
                 'my-task/cancel' => 'user-task/canceled',

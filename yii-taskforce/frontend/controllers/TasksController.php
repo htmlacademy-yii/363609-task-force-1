@@ -7,6 +7,7 @@ use frontend\models\db\Cities;
 use frontend\models\db\Opinions;
 use frontend\models\db\Replies;
 use frontend\models\db\Tasks;
+use frontend\models\db\TasksFiles;
 use frontend\models\form\TasksForm;
 use src\model\NoticeModel;
 use Yii;
@@ -66,7 +67,7 @@ class TasksController extends SecuredController
      */
     public function actionView($id)
     {
-        $model = Tasks::findOne($id);
+        $model = Tasks::find()->where(['id' => $id])->one();
         if (empty($model)) {
             throw new NotFoundHttpException('Задание не найдено');
         }
@@ -82,9 +83,12 @@ class TasksController extends SecuredController
             $replies = $model->getReplies()->andWhere(['user_id' => $userId])->all();
         }
 
+        $files = TasksFiles::find()->where(['id_task' => $id])->all();
+
         return $this->render('view',
             [
                 'model' => $model,
+                'files' => $files,
                 'interval' => $interval,
                 'replies' => $replies,
                 'actions' => $model->getAvailableActions(),

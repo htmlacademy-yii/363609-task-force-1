@@ -97,7 +97,7 @@ AppAsset::register($this);
                 </div>
                 <div class="header__account">
                     <a class="header__account-photo">
-                        <img src="<?=Yii::$app->user->identity->photo?>"
+                        <img src="<?=Yii::$app->user->identity->photo ?? Yii::$app->params['defaultPhoto']?>"
                              width="43" height="44"
                              alt="<?=Html::encode(Yii::$app->user->identity->name)?>">
                     </a>

@@ -21,7 +21,7 @@ $this->title = 'Редактирование настроек профиля';
             <h3 class="div-line">Настройки аккаунта</h3>
             <div class="account__redaction-section-wrapper">
                 <div class="account__redaction-avatar">
-                    <img src="<?=$model->photo?>" width="156" height="156">
+                    <img src="<?=$model->photo ?? Yii::$app->params['defaultPhoto']?>" width="156" height="156">
                     <?=Html::activeFileInput($model, 'photo', ['id' => 'upload-avatar'])?>
                     <label for="upload-avatar" class="link-regular">Сменить аватар</label>
                 </div>

@@ -12,7 +12,9 @@ use yii\helpers\Html;
     <p class="new-task_description">
         <?=Html::encode($model->description)?>
     </p>
-    <b class="new-task__price new-task__price--translation"><?=$model->budget?><b> ₽</b></b>
+    <?php if($model->budget) :?>
+        <b class="new-task__price new-task__price--translation"><?=$model->budget?><b> ₽</b></b>
+    <?php endif;?>
     <p class="new-task__place"><?=$model->address?></p>
     <span class="new-task__time"><?=$model->dt_add?></span>
 </div>
