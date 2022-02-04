@@ -11,7 +11,7 @@ $this->title = $model->name;
 <section class="content-view">
     <div class="user__card-wrapper">
         <div class="user__card">
-            <img src="<?=$model->photo?>" width="120" height="120" alt="<?=Html::encode($model->name)?>">
+            <img src="<?=$model->photo ?? Yii::$app->params['defaultPhoto']?>" width="120" height="120" alt="<?=Html::encode($model->name)?>">
             <div class="content-view__headline">
                 <h1><?=Html::encode($model->name)?></h1>
                 <p><?=$model->city->city ?? ''?>, <?=$age ? $age . ' лет' : ''?></p>

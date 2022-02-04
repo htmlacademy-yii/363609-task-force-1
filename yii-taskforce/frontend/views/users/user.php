@@ -6,7 +6,7 @@ use yii\helpers\Html;
 <div class="content-view__feedback-card user__search-wrapper">
     <div class="feedback-card__top">
         <div class="user__search-icon">
-            <a href="<?=Url::to(['users/view', 'id' => $model->id])?>"><img src="<?=$model->photo?>" width="65" height="65"></a>
+            <a href="<?=Url::to(['users/view', 'id' => $model->id])?>"><img src="<?=$model->photo ?? Yii::$app->params['defaultPhoto']?>" width="65" height="65"></a>
             <span><?=count($model->tasksExecutor)?> заданий</span>
             <span><?=count($model->opinions)?> отзывов</span>
         </div>

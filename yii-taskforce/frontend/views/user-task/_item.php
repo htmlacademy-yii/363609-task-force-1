@@ -17,7 +17,7 @@ use yii\helpers\Html;
     </p>
     <?php if(!empty($model->executor_id)): ?>
         <div class="feedback-card__top ">
-            <a href="<?=Url::to(['users/view', 'id' => $model->executor_id])?>"><img src="<?=$model->executor->photo ?? ''?>" width="36" height="36"></a>
+            <a href="<?=Url::to(['users/view', 'id' => $model->executor_id])?>"><img src="<?=$model->executor->photo ?? Yii::$app->params['defaultPhoto']?>" width="36" height="36"></a>
             <div class="feedback-card__top--name my-list__bottom">
                 <p class="link-name"><a href="<?=Url::to(['users/view', 'id' => $model->executor_id])?>" class="link-regular"><?=$model->executor->name ?? ''?></a></p>
                 <a href="<?=Url::to(['tasks/view', 'id' => $model->id])?>" class="my-list__bottom-chat  my-list__bottom-chat--new"><b><?=count($model->messages)?></b></a>
